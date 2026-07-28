@@ -119,6 +119,22 @@ const Login: React.FC = () => {
                   {loading ? 'Validating Registry...' : 'Gain High-Level Access'}
                 </button>
               </form>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '16px 0' }}>
+                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+                <span style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 600 }}>OR</span>
+                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+              </div>
+
+              <button
+                className={styles.googleButton}
+                onClick={() => handleGoogleAuth('buyer')}
+                disabled={loading}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff', fontWeight: 600, cursor: 'pointer' }}
+              >
+                <FcGoogle size={22} />
+                Sign in with Google
+              </button>
             </div>
           </main>
         </div>
