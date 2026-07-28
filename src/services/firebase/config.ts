@@ -1,9 +1,8 @@
 console.log('Firebase Config: Initialization Start');
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
-const MOCK = !import.meta.env.FIREBASE_API_KEY || import.meta.env.VITE_ENABLE_MOCK_DATA === 'true';
 const API_KEY = import.meta.env.FIREBASE_API_KEY || 'mock-api-key';
 const PROJECT_ID = import.meta.env.FIREBASE_PROJECT_ID || 'anisell-mock';
 
@@ -21,10 +20,5 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
-
-if (MOCK) {
-  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-  connectFirestoreEmulator(db, 'localhost', 8080);
-}
 
 export { app, auth, db, googleProvider };

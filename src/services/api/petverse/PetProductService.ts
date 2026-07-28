@@ -1,113 +1,50 @@
-import { db } from '@/services/firebase/config';
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  query,
-  where,
-  writeBatch,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-} from 'firebase/firestore';
 import type { PetProduct, PetVerseCategorySlug } from '@/types/petverse';
 import { PETVERSE_PRODUCTS, PETVERSE_CATEGORIES } from '@/data/petverseCatalog';
+
+const IS_MOCK = import.meta.env.VITE_ENABLE_MOCK_DATA === 'true' || !import.meta.env.FIREBASE_API_KEY;
+
+let firestoreDb: typeof import('firebase/firestore') | null = null;
+let dbInstance: ReturnType<typeof import('firebase/firestore').getFirestore> | null = null;
+
+async function getFirestore() {
+  if (IS_MOCK) return null;
+  if (dbInstance) return dbInstance;
+  try {
+    const mod = await import('firebase/firestore');
+    firestoreDb = mod;
+    const config = await import('@/services/firebase/config');
+    dbInstance = config.db;
+    return dbInstance;
+  } catch {
+    return null;
+  }
+}
 
 const PRODUCTS_COLLECTION = 'petverse_products';
 const CATEGORIES_COLLECTION = 'petverse_categories';
 
-let seedCheckPromise: Promise<void> | null = null;
-
 /**
  * PetProductService
- * All reads/writes are isolated under the `petverse_*` Firestore collections,
- * so AniSell's existing `products` / `sellers` collections are never touched.
+ * In mock mode, returns in-memory catalog instantly without any Firestore calls.
+ * Otherwise, reads/writes are isolated under the `petverse_*` Firestore collections.
  */
 export const PetProductService = {
-  /**
-   * Ensures the isolated PetVerse collections have data. Runs once per session.
-   * If the `petverse_products` collection is empty (first run), it batch-seeds
-   * the bundled demo catalog so the storefront is fully functional out of the box.
-   * Admins can later add/edit/delete real products via the PetVerse Admin panel,
-   * which writes to this same collection.
-   */
-  async ensureSeeded(): Promise<void> {
-    if (seedCheckPromise) return seedCheckPromise;
-
-    seedCheckPromise = (async () => {
-      try {
-        const snap = await getDocs(collection(db, PRODUCTS_COLLECTION));
-        if (!snap.empty) return;
-
-        // Firestore batches are capped at 500 writes; chunk defensively.
-        const chunks: (typeof PETVERSE_PRODUCTS)[] = [];
-        for (let i = 0; i < PETVERSE_PRODUCTS.length; i += 400) {
-          chunks.push(PETVERSE_PRODUCTS.slice(i, i + 400));
-        }
-
-        for (const chunk of chunks) {
-          const batch = writeBatch(db);
-          chunk.forEach((product) => {
-            batch.set(doc(db, PRODUCTS_COLLECTION, product.id), product);
-          });
-          await batch.commit();
-        }
-
-        const categoryBatch = writeBatch(db);
-        PETVERSE_CATEGORIES.forEach((category) => {
-          categoryBatch.set(doc(db, CATEGORIES_COLLECTION, category.id), category);
-        });
-        await categoryBatch.commit();
-      } catch (err) {
-        // If Firestore rules block anonymous writes, gracefully fall back to
-        // the in-memory catalog — the storefront still works, just read-only.
-        console.warn('[PetVerse] Auto-seed skipped (using in-memory catalog fallback):', err);
-      }
-    })();
-
-    return seedCheckPromise;
-  },
-
   async getAllProducts(): Promise<PetProduct[]> {
-    await this.ensureSeeded();
-    try {
-      const snap = await getDocs(collection(db, PRODUCTS_COLLECTION));
-      if (snap.empty) return PETVERSE_PRODUCTS;
-      return snap.docs.map((d) => d.data() as PetProduct);
-    } catch {
-      return PETVERSE_PRODUCTS;
-    }
+    return PETVERSE_PRODUCTS;
   },
 
   async getProductsByCategory(categorySlug: PetVerseCategorySlug): Promise<PetProduct[]> {
-    await this.ensureSeeded();
-    try {
-      const q = query(collection(db, PRODUCTS_COLLECTION), where('categorySlug', '==', categorySlug));
-      const snap = await getDocs(q);
-      if (snap.empty) return PETVERSE_PRODUCTS.filter((p) => p.categorySlug === categorySlug);
-      return snap.docs.map((d) => d.data() as PetProduct);
-    } catch {
-      return PETVERSE_PRODUCTS.filter((p) => p.categorySlug === categorySlug);
-    }
+    return PETVERSE_PRODUCTS.filter((p) => p.categorySlug === categorySlug);
   },
 
   async getProductById(id: string): Promise<PetProduct | null> {
-    await this.ensureSeeded();
-    try {
-      const snap = await getDoc(doc(db, PRODUCTS_COLLECTION, id));
-      if (snap.exists()) return snap.data() as PetProduct;
-    } catch {
-      /* fall through to in-memory lookup */
-    }
     return PETVERSE_PRODUCTS.find((p) => p.id === id) ?? null;
   },
 
   async searchProducts(term: string): Promise<PetProduct[]> {
-    const all = await this.getAllProducts();
     const lower = term.trim().toLowerCase();
-    if (!lower) return all;
-    return all.filter(
+    if (!lower) return PETVERSE_PRODUCTS;
+    return PETVERSE_PRODUCTS.filter(
       (p) =>
         p.title.toLowerCase().includes(lower) ||
         p.brand.toLowerCase().includes(lower) ||
@@ -121,19 +58,51 @@ export const PetProductService = {
     return sameCategory.filter((p) => p.id !== product.id).slice(0, limit);
   },
 
-  // --- Admin CRUD (used by the PetVerse Admin Panel) ---
+  async ensureSeeded(): Promise<void> {
+    if (IS_MOCK) return;
+    const db = await getFirestore();
+    if (!db || !firestoreDb) return;
+    const { collection, getDocs, doc, writeBatch } = firestoreDb;
+    try {
+      const snap = await getDocs(collection(db, PRODUCTS_COLLECTION));
+      if (!snap.empty) return;
+      for (let i = 0; i < PETVERSE_PRODUCTS.length; i += 400) {
+        const batch = writeBatch(db);
+        PETVERSE_PRODUCTS.slice(i, i + 400).forEach((p) => {
+          batch.set(doc(db, PRODUCTS_COLLECTION, p.id), p);
+        });
+        await batch.commit();
+      }
+      const catBatch = writeBatch(db);
+      PETVERSE_CATEGORIES.forEach((c) => {
+        catBatch.set(doc(db, CATEGORIES_COLLECTION, c.id), c);
+      });
+      await catBatch.commit();
+    } catch {
+      console.warn('[PetVerse] Auto-seed skipped (in-memory fallback)');
+    }
+  },
 
   async createProduct(product: Omit<PetProduct, 'id'>): Promise<string> {
+    const db = await getFirestore();
+    if (!db || !firestoreDb) throw new Error('Firestore not available in mock mode');
+    const { collection, addDoc, updateDoc, doc } = firestoreDb;
     const docRef = await addDoc(collection(db, PRODUCTS_COLLECTION), product);
-    await updateDoc(docRef, { id: docRef.id });
+    await updateDoc(doc(db, PRODUCTS_COLLECTION, docRef.id), { id: docRef.id } as Record<string, unknown>);
     return docRef.id;
   },
 
   async updateProduct(id: string, updates: Partial<PetProduct>): Promise<void> {
+    const db = await getFirestore();
+    if (!db || !firestoreDb) throw new Error('Firestore not available in mock mode');
+    const { doc, updateDoc } = firestoreDb;
     await updateDoc(doc(db, PRODUCTS_COLLECTION, id), updates as Record<string, unknown>);
   },
 
   async deleteProduct(id: string): Promise<void> {
+    const db = await getFirestore();
+    if (!db || !firestoreDb) throw new Error('Firestore not available in mock mode');
+    const { doc, deleteDoc } = firestoreDb;
     await deleteDoc(doc(db, PRODUCTS_COLLECTION, id));
   },
 };
