@@ -57,7 +57,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       try {
         if (firebaseUser) {
-          const isUserAdmin = isAdminEmail(firebaseUser.email);
+          const userEmail = firebaseUser.email;
+          const adminEmails = import.meta.env.VITE_ADMIN_EMAILS || 'admin@anisell.com';
+          console.log('[Auth] Firebase user email:', userEmail, '| VITE_ADMIN_EMAILS:', adminEmails);
+          const isUserAdmin = isAdminEmail(userEmail);
           
           if (isAsAdmin) {
              if (!isUserAdmin) {
@@ -120,7 +123,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setBuyerData(null);
         }
       } catch (err) {
-        console.error('Session Hydration Error:', err);
+        console.error('[Auth] Session hydration error:', err);
+        if (firebaseUser) {
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            displayName: firebaseUser.displayName || 'User',
+            photoURL: firebaseUser.photoURL || '',
+            role: isAdminEmail(firebaseUser.email) ? 'admin' : 'buyer'
+          });
+        }
       } finally {
         setLoading(false);
       }
