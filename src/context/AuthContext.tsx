@@ -75,12 +75,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 role: 'admin'
              });
           } else {
-             if (isUserAdmin) {
-                // If on main domain but user IS an admin, clear session.
-                await AuthService.logout();
-                setUser(null);
-                return;
-             }
+           if (isUserAdmin) {
+                 setUser({
+                    uid: firebaseUser.uid,
+                    email: firebaseUser.email || '',
+                    displayName: 'System Administrator',
+                    photoURL: 'https://cdn-icons-png.flaticon.com/512/6024/6024190.png',
+                    role: 'admin'
+                 });
+                 setLoading(false);
+                 return;
+              }
              
              // Standard User/Seller Load (Firestore usage)
              const userRef = doc(db, 'users', firebaseUser.uid);

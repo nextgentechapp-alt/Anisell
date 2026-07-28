@@ -64,6 +64,20 @@ export const AuthService = {
   async loginWithGoogle(requestedRole: 'buyer' | 'seller'): Promise<{ user?: User; sellerData?: Seller | null; buyerData?: Buyer | null; requiresConfirmation?: boolean; pendingUserData?: User }> {
     const result = await signInWithPopup(auth, googleProvider);
     const firebaseUser = result.user;
+
+    if (isAdminEmail(firebaseUser.email)) {
+      return {
+        user: {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          displayName: 'System Administrator',
+          photoURL: firebaseUser.photoURL || 'https://cdn-icons-png.flaticon.com/512/6024/6024190.png',
+          role: 'admin'
+        },
+        sellerData: null,
+        buyerData: null
+      };
+    }
     
     const userRef = doc(db, 'users', firebaseUser.uid);
     const userSnap = await getDoc(userRef);
