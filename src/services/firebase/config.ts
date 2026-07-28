@@ -1,7 +1,7 @@
 console.log('Firebase Config: Initialization Start');
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const API_KEY = import.meta.env.FIREBASE_API_KEY || 'mock-api-key';
 const PROJECT_ID = import.meta.env.FIREBASE_PROJECT_ID || 'anisell-mock';
@@ -16,19 +16,9 @@ const firebaseConfig = {
   measurementId: import.meta.env.FIREBASE_MEASUREMENT_ID || 'G-0000000000'
 };
 
-let app;
-let auth;
-let db;
-let googleProvider;
-
-try {
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-  auth = getAuth(app);
-  db = getFirestore(app);
-  googleProvider = new GoogleAuthProvider();
-  console.log('Firebase initialized with project:', PROJECT_ID);
-} catch (err) {
-  console.warn('Firebase initialization skipped (mock mode):', err);
-}
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
 export { app, auth, db, googleProvider };
