@@ -120,7 +120,11 @@ const mainRouter = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: isVercel() ? <Navigate to="/admin/profile" replace /> : <Navigate to={getAdminSubdomainUrl()} replace />,
+    element: isVercel() ? <Navigate to="/" replace /> : <Navigate to={getAdminSubdomainUrl()} replace />,
+  },
+  {
+    path: '/admin/*',
+    element: isVercel() ? <Navigate to="/" replace /> : <Navigate to={getAdminSubdomainUrl()} replace />,
   },
   {
     path: '*',

@@ -55,7 +55,7 @@ const Login: React.FC = () => {
       }
       
       let redirectPath: string = ROUTES.USER_PROFILE;
-      if (authData?.user?.role === 'admin') redirectPath = ROUTES.ADMIN_DASHBOARD;
+      if (authData?.user?.role === 'admin') redirectPath = isAdm ? '/' : ROUTES.ADMIN_DASHBOARD;
       if (authData?.user?.role === 'seller') redirectPath = ROUTES.SELLER_DASHBOARD;
       
       navigate(redirectPath);
@@ -80,7 +80,7 @@ const Login: React.FC = () => {
     }
   };
 
-  // 1. High-Fidelity Administrative Portal (Split Layout)
+  // 1. High-Fidelity Administrative Portal (Split Layout) — only used on admin subdomain
   if (isAdm) {
     return (
       <div className={styles.page}>

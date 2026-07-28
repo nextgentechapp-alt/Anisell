@@ -26,14 +26,7 @@ export const isVercel = (): boolean => {
 
 export const isAdminSubdomain = (): boolean => {
   const sub = getSubdomain();
-  if (sub === 'admin') return true;
-  
-  // Fallback for Vercel deployments where nested subdomains aren't supported
-  if (isVercel() && window.location.pathname.startsWith('/admin')) {
-    return true;
-  }
-  
-  return false;
+  return sub === 'admin';
 };
 
 export const isAdminEmail = (email: string | null | undefined): boolean => {
