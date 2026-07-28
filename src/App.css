@@ -1,0 +1,1136 @@
+/* =========================
+   NAVBAR
+========================= */
+
+.nav-wrapper {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(10px, 4vw, 40px);
+  padding: 12px 20px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.logo {
+  height: 45px;
+}
+
+.mobileMenuTrigger {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobileMenuTrigger {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 8px;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mobileMenuTrigger:hover {
+    background: #f1f5f9;
+  }
+}
+
+/* =========================
+   SEARCH BAR
+========================= */
+
+.search {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  margin: 0 auto;
+  padding: 4px;
+  border: 1.5px solid #ccc;
+  border-radius: 100px;
+  transition: all 0.25s ease;
+}
+
+.search:focus-within {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+.search a {
+  display: flex;
+  text-decoration: none;
+}
+
+.search button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 480px) {
+  .search button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+.search button:hover {
+  background: #0056b3;
+}
+
+/* =========================
+   LOGIN BUTTON
+========================= */
+
+.login-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background: #0056b3;
+}
+
+/* =========================
+   BREED BROWSER
+========================= */
+
+.breed-section {
+  position: relative;
+  max-width: 1200px;
+  margin: auto;
+  padding: 10px 20px;
+}
+
+.breed-scroll-wrapper {
+  position: relative;
+}
+
+/* Scroll container */
+
+
+.breed-scroll {
+  display: flex;
+  gap: 32px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 20px 40px;
+  scrollbar-width: none;
+}
+
+.breed-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Breed card */
+
+.breed-card {
+  min-width: 100px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Image */
+
+.img-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  margin: auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.img-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Breed name */
+
+.breed-name {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.2;
+  max-width: 80px;
+  text-align: center;
+}
+
+/* =========================
+   ARROWS
+========================= */
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.arrow svg {
+  width: 32px;
+  height: 32px;
+  stroke: #007bff;
+  stroke-width: 1.5;
+  fill: none;
+  transition: transform 0.3s ease;
+}
+
+.arrow.left {
+  left: 25px;
+}
+
+.arrow.right {
+  right: 25px;
+}
+
+.arrow.left svg:hover {
+  transform: translateX(-5px);
+}
+
+.arrow.right svg:hover {
+  transform: translateX(5px);
+}
+
+/* =========================
+   MARKETPLACE SECTION
+========================= */
+
+.marketplace-section {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.marketplace-header {
+  margin-bottom: 30px;
+}
+
+.badge {
+  display: inline-block;
+  background-color: #e6f0ff;
+  color: #007bff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.marketplace-header h2 {
+  font-size: clamp(24px, 4vw, 36px);
+  color: #1a202c;
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+
+.marketplace-header p {
+  color: #64748b;
+  font-size: clamp(14px, 2vw, 16px);
+}
+
+
+
+/* Pet Grid */
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  text-align: left;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.pet-card-main {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #f1f5f9;
+}
+
+.pet-card-main:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+.pet-image-wrapper {
+  position: relative;
+  aspect-ratio: 4/3;
+  width: 100%;
+}
+
+.pet-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pet-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+.pet-tag.new {
+  background-color: #10b981;
+}
+
+.pet-tag.featured {
+  background-color: #3b82f6;
+}
+
+.pet-tag.sale {
+  background-color: #ef4444;
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  color: #64748b;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+
+.favorite-btn:hover {
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+.pet-info {
+  padding: 20px;
+}
+
+.pet-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.pet-name-main {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--anisell-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.pet-age {
+  font-size: 12px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pet-price-row {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pet-price {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.pet-original-price {
+  font-size: 14px;
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-weight: 600;
+}
+
+.pet-seller-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #64748b;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+  gap: 12px;
+}
+
+.pet-seller, .pet-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pet-seller span, .pet-location span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.verified-icon {
+  color: #007bff;
+  font-size: 15px;
+}
+
+.location-icon {
+  color: #94a3b8;
+}
+
+.view-details-btn {
+  width: 100%;
+  padding: 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.view-details-btn:hover {
+  background: #0056b3;
+}
+
+.view-all-container {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: white;
+  color: #007bff;
+  border: 1px solid #007bff;
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-all-btn:hover {
+  background: #f8fafc;
+  gap: 12px;
+}
+
+/* =========================
+   SELLERS SECTION
+========================= */
+
+.sellers-section {
+  width: 100%;
+  margin: 60px 0;
+  padding: 60px 0;
+  text-align: center;
+  background-color: #f7f9fc;
+}
+
+.sellers-header {
+  margin-bottom: 40px;
+}
+
+.sellers-header h2 {
+  font-size: clamp(24px, 4vw, 36px);
+  color: #1a202c;
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+
+.sellers-header p {
+  color: #64748b;
+  font-size: clamp(14px, 2vw, 16px);
+}
+
+.sellers-grid-minimal {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.seller-card-minimal {
+  padding: 32px 24px;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 24px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seller-card-minimal:hover {
+  border-color: #007bff;
+  box-shadow: 0 10px 20px rgba(0, 123, 255, 0.05);
+}
+
+.seller-avatar-minimal {
+  width: 80px;
+  height: 80px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin:  20px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.seller-card-minimal:hover .seller-avatar-minimal {
+  transform: scale(1.05);
+}
+
+.seller-name-minimal {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.verified-icon-minimal {
+  color: #007bff;
+  font-size: 14px;
+}
+
+.seller-location-minimal {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.seller-meta-minimal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.seller-rating-minimal {
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dot {
+  color: #cbd5e1;
+}
+
+.seller-pets-minimal {
+  color: #64748b;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+
+
+@media (max-width: 900px) {
+  .breed-scroll {
+    gap: 22px;
+  }
+  
+  .pet-grid {
+    gap: 16px;
+  }
+
+  .sellers-grid-minimal {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .breed-scroll {
+    gap: 18px;
+    padding: 20px;
+  }
+
+  .img-box {
+    width: 50px;
+    height: 50px;
+  }
+
+  .breed-name {
+    font-size: 12px;
+    max-width: 70px;
+  }
+
+  .pet-info {
+    padding: 12px;
+  }
+
+  .pet-title-row {
+    margin-bottom: 8px;
+  }
+
+  .pet-name-main {
+    font-size: 15px;
+  }
+
+  .pet-price {
+    font-size: 18px;
+  }
+
+  .pet-price-row {
+    margin-bottom: 10px;
+  }
+
+  .pet-seller-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 11px;
+    padding-top: 10px;
+    margin-bottom: 12px;
+  }
+
+  .view-details-btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .pet-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 0 auto;
+  }
+  
+  .pet-seller-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .sellers-grid-minimal {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    order: 1;
+    height: 38px;
+  }
+
+  .login-btn {
+    order: 2;
+  }
+
+  .search {
+    order: 3;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .search button {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .breed-card {
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 400px) {
+  .breed-scroll {
+    gap: 14px;
+    padding: 15px;
+  }
+
+  .img-box {
+    width: 45px;
+    height: 45px;
+  }
+
+  .breed-name {
+    font-size: 11px;
+    max-width: 60px;
+  }
+}
+
+@media (max-width: 350px) {
+  .breed-scroll {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .img-box {
+    width: 40px;
+    height: 40px;
+  }
+
+  .breed-name {
+    font-size: 10px;
+    max-width: 50px;
+  }
+
+  .breed-card {
+    min-width: 70px;
+  }
+}
+
+/* =========================
+   FEATURES SECTION
+========================= */
+
+.features-section {
+  padding: 80px 20px;
+  background-color: #fff;
+}
+
+.features-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.feature-icon-box {
+  width: 60px;
+  height: 60px;
+  background-color: #f0f7ff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.feature-icon {
+  font-size: 28px;
+  color: #007bff;
+}
+
+.feature-item h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.feature-item p {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* =========================
+   HOME OPTIMIZATIONS
+========================= */
+
+.top-performer-tag {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: linear-gradient(135deg, #ff9a00 0%, #ff5e00 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 8px rgba(255, 94, 0, 0.3);
+  z-index: 5;
+  animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.seller-card-minimal {
+  position: relative; /* For top-performer tag positioning */
+}
+
+/* Ensure marketplace headers look premium */
+.marketplace-header .badge {
+  background: linear-gradient(to right, #e6f0ff, #f0f7ff);
+  color: #007bff;
+  border: 1px solid #d0e3ff;
+}
+
+/* =========================
+   GENERIC UTILITIES
+======================== */
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 900px) {
+  .features-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+}
+
+@media (max-width: 640px) {
+  .features-section {
+    padding: 40px 0;
+    overflow-x: hidden;
+  }
+
+  .features-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 24px;
+    padding: 20px;
+    grid-template-columns: none;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+  }
+
+  .features-container::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
+  }
+
+  .feature-item {
+    min-width: 260px;
+    max-width: 260px;
+    scroll-snap-align: center;
+    background: #f8fafc;
+    padding: 30px 20px;
+    border-radius: 20px;
+  }
+}
+
+/* =========================
+   MAIN FOOTER
+========================= */
+
+.main-footer {
+  background-color: #0b1120;
+  color: #94a3b8;
+  padding-top: 80px;
+}
+
+.footer-top {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+
+.brand-col {
+  padding-right: 20px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.logo-paw {
+  font-size: 24px;
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.footer-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.social-links {
+  display: flex;
+  gap: 12px;
+}
+
+.social-links a {
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+  background-color: #007bff;
+  transform: translateY(-3px);
+}
+
+.footer-column h5 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+
+.footer-column ul {
+  list-style: none;
+}
+
+.footer-column ul li {
+  margin-bottom: 12px;
+}
+
+.footer-column ul li a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.footer-column ul li a:hover {
+  color: #007bff;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 30px 20px;
+}
+
+.footer-bottom-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.dev-credits {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.dev-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.dev-credits a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.dev-credits a:hover {
+  color: #007bff;
+}
+
+.copyright {
+  font-size: 13px;
+}
+
+.payment-methods {
+  display: flex;
+  gap: 10px;
+}
+
+.payment-badge {
+  padding: 4px 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .footer-top {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-bottom-container {
+    flex-direction: column-reverse;
+    gap: 24px;
+    text-align: center;
+  }
+  
+  .dev-credits {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 550px) {
+  .footer-top {
+    grid-template-columns: repeat(2, 1fr);
+    text-align: left;
+    padding: 20px 40px;
+    gap: 30px 20px;
+  }
+
+  .brand-col {
+    grid-column: span 2;
+    margin-bottom: 10px;
+  }
+
+  .footer-logo, .social-links {
+    justify-content: flex-start;
+  }
+
+  .footer-column h5 {
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+}

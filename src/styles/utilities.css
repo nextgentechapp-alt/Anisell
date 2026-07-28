@@ -1,0 +1,88 @@
+/* 
+  Global Utility Classes 
+  Reusable utility classes for layout, spacing, and common styling patterns.
+*/
+
+/* --- Flexbox Utilities --- */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-row { display: flex; flex-direction: row; }
+.justify-between { display: flex; justify-content: space-between; }
+.justify-center { display: flex; justify-content: center; }
+.align-center { display: flex; align-items: center; }
+.gap-1 { gap: var(--spacing-1); }
+.gap-2 { gap: var(--spacing-2); }
+.gap-4 { gap: var(--spacing-4); }
+.gap-8 { gap: var(--spacing-8); }
+
+/* --- Grid Utilities --- */
+.grid { display: grid; }
+.grid-cols-1 { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* --- Spacing Utilities --- */
+.m-0 { margin: 0; }
+.mt-2 { margin-top: var(--spacing-2); }
+.mt-4 { margin-top: var(--spacing-4); }
+.mt-8 { margin-top: var(--spacing-8); }
+.p-4 { padding: var(--spacing-4); }
+.p-6 { padding: var(--spacing-6); }
+.p-8 { padding: var(--spacing-8); }
+
+/* --- Typography Utilities --- */
+.text-center { text-align: center; }
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.font-bold { font-weight: 700; }
+.text-muted { color: var(--color-text-muted); }
+
+/* --- Visibility Utilities --- */
+.hidden { display: none; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+
+/* --- Common UI Patterns --- */
+.card-base {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+.button-base {
+  padding: var(--spacing-2) var(--spacing-6);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+.button-primary {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.button-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.button-outline {
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-main);
+}
+
+.button-outline:hover {
+  background-color: var(--color-background);
+  border-color: var(--color-text-muted);
+}

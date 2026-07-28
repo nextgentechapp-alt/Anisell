@@ -1,0 +1,265 @@
+.container {
+  padding: var(--spacing-6) 0;
+}
+
+.inputSection {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+}
+
+.inputRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-3);
+}
+
+.inputGroup {
+  flex: 1;
+  max-width: 280px;
+}
+
+.inputLabel {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 6px;
+}
+
+.pinInput {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-family: monospace;
+  transition: var(--transition-fast);
+}
+
+.pinInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.errorText {
+  margin-top: var(--spacing-3);
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-8);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.resultCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+}
+
+.resultHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-3);
+}
+
+.serviceableBadge {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.storeName {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.metroBadge {
+  display: inline-block;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--spacing-3);
+}
+
+.estimatedDate {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-main);
+  margin-bottom: var(--spacing-6);
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+}
+
+.optionCard {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  text-align: center;
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.optionCard:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.optionIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: var(--spacing-2);
+}
+
+.optionLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 4px;
+}
+
+.optionDays {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  display: block;
+  margin-bottom: var(--spacing-2);
+}
+
+.optionCost {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.weightCalc {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-4);
+}
+
+.calcTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  margin-bottom: var(--spacing-3);
+}
+
+.calcRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+}
+
+.calcLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.calcSelect {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  background: var(--color-surface);
+}
+
+.calcCost {
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  margin-left: auto;
+}
+
+.unserviceable {
+  text-align: center;
+  padding: var(--spacing-8);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-error);
+  border-radius: var(--radius-lg);
+}
+
+.unserviceableIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-3);
+}
+
+.unserviceable h4 {
+  color: var(--color-error);
+  margin-bottom: var(--spacing-2);
+}
+
+.unserviceable p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.placeholder {
+  text-align: center;
+  padding: var(--spacing-10);
+  color: var(--color-text-muted);
+}
+
+.placeholderIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-3);
+}
+
+.placeholder p {
+  font-size: var(--font-size-sm);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .inputRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inputGroup {
+    max-width: none;
+  }
+}

@@ -1,0 +1,188 @@
+@import '@/styles/variables.css';
+
+.card {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  cursor: pointer;
+  position: relative;
+  text-decoration: none;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  border-color: #e0e7ff;
+}
+
+/* Image Section Styling */
+.mediaWrapper {
+  position: relative;
+  border-radius: 16px;
+  margin: 12px;
+  height: 200px;
+  overflow: hidden;
+  background-color: #f8fafc;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+.card:hover .image {
+  transform: scale(1.08);
+}
+
+.statusOverlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
+  z-index: 5;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status_APPROVED {
+  background: rgba(236, 253, 245, 0.9);
+  color: #059669;
+}
+
+.status_PENDING {
+  background: rgba(255, 251, 235, 0.9);
+  color: #d97706;
+}
+
+.status_REJECTED {
+  background: rgba(254, 242, 242, 0.9);
+  color: #dc2626;
+}
+
+/* Card Body Section */
+.content {
+  padding: 0 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.headerRow {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.verifiedIcon {
+  font-size: 20px;
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+/* Gender Badges Coloring */
+.genderIconMale { color: #3b82f6; font-size: 1.2em; }
+.genderIconFemale { color: #ec4899; font-size: 1.2em; }
+.genderIconPair { color: #a855f7; font-size: 1.2em; }
+
+/* Description Styling */
+.description {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  height: 22px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+/* Price Section Styling */
+.priceSection {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-top: auto;
+  padding-bottom: 16px;
+}
+
+.priceCurrency {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.priceValue {
+  font-size: 20px;
+  font-weight: 900;
+  color: #1e293b;
+}
+
+/* Footer Section Styling */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.infoChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.chipIcon {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+@media (max-width: 640px) {
+  .card { border-radius: 16px; }
+  .mediaWrapper { height: 160px; margin: 8px; }
+  .content { padding: 0 16px 16px 16px; }
+  .title { font-size: 15px; gap: 4px; }
+  .verifiedIcon { font-size: 16px; }
+  .description { font-size: 12px; margin-bottom: 12px; }
+  .priceValue { font-size: 16px; }
+  .priceCurrency { font-size: 13px; }
+  .footer { padding-top: 10px; }
+  .infoChip { font-size: 10px; }
+}

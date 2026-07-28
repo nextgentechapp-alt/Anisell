@@ -1,0 +1,133 @@
+@import '@/styles/variables.css';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-text-main);
+  margin-bottom: var(--spacing-1);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-6);
+}
+
+.productWrapper {
+  position: relative;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.productWrapper:hover {
+  transform: translateY(-8px);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Neutralize redundant nested hover mechanics from generic ProductCard component */
+.productWrapper :global(.ProductCard_card__BT05S):hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* Or more robustly, if using direct tag access if we can't guess the hashed name */
+.productWrapper > a:hover,
+.productWrapper a:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.actionsOverlay {
+  padding: var(--spacing-4);
+  background-color: var(--color-background);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+}
+
+/* Optional: Make actions more prominent on hover */
+.productWrapper:hover .actionsOverlay {
+  background-color: #f0f7ff;
+}
+
+.statusBox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.stock {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.btnGroup {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.actionBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.actionBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+.deleteBtn:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+  background-color: var(--color-error-light);
+}
+
+.emptyState {
+  padding: var(--spacing-12);
+  text-align: center;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}

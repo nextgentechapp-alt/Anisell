@@ -1,0 +1,252 @@
+.wrapper {
+  padding: var(--spacing-6) 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.avatarDog { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.avatarCat { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.avatarBird { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+.avatarFish { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.avatarOther { background: linear-gradient(135deg, #6b7280, #4b5563); }
+
+.petName {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.speciesBadge {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-main);
+}
+
+.detailLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.tagsRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-3);
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.cardActions {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-3);
+}
+
+.cardActionBtn {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-text-main);
+  text-align: center;
+  transition: var(--transition-fast);
+}
+
+.cardActionBtn:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-primary);
+}
+
+.cardActionDanger:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.addCard {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  cursor: pointer;
+  background: var(--color-surface);
+  transition: var(--transition-fast);
+  color: var(--color-text-muted);
+}
+
+.addCard:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-bg-hover);
+}
+
+.addIcon {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-2);
+}
+
+.addText {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+}
+
+.formTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 4px;
+}
+
+.fieldInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background: var(--color-surface);
+  color: var(--color-text-main);
+  box-sizing: border-box;
+}
+
+.fieldInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.fieldTextarea {
+  resize: vertical;
+  min-height: 64px;
+  font-family: inherit;
+}
+
+.formActions {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-4);
+  justify-content: flex-end;
+}
+
+.photoPlaceholder {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: 12px 16px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.photoPlaceholder:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-12) var(--spacing-4);
+  color: var(--color-text-muted);
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-4);
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

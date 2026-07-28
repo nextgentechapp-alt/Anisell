@@ -1,0 +1,55 @@
+@import '@/styles/variables.css';
+
+.badge {
+  display: inline-flex;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Size Variations --- */
+.sizeSM {
+  padding: 2px 8px;
+  font-size: 10px;
+}
+
+.sizeMD {
+  padding: 4px 12px;
+  font-size: var(--font-size-xs);
+}
+
+.sizeLG {
+  padding: 6px 16px;
+  font-size: var(--font-size-sm);
+}
+
+/* --- Status Alignments --- */
+.variantPrimary {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.variantSuccess {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.variantWarning {
+  background-color: #fff7ed;
+  color: #ea580c;
+}
+
+.variantError {
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+}
+
+.variantNeutral {
+  background-color: var(--color-background);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}

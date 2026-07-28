@@ -1,0 +1,307 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pointsBalance {
+  background: linear-gradient(135deg, var(--color-primary), #9333ea);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 28px;
+}
+
+.pointsLabel {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.pointsAmount {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.pointsCurrency {
+  font-size: 20px;
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
+.tierSection {
+  margin-bottom: 28px;
+}
+
+.tierCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.tierLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.tierName {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 12px;
+}
+
+.progressBar {
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #9333ea);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.progressText {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 16px;
+}
+
+.benefitsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 28px;
+  font-size: 14px;
+}
+
+.benefitsTable th,
+.benefitsTable td {
+  border: 1px solid var(--color-border);
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.benefitsTable th {
+  background: var(--color-bg);
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
+.benefitsTable td {
+  color: var(--color-text-main);
+}
+
+.benefitsTable .benefitLabel {
+  text-align: left;
+  color: var(--color-text-muted);
+}
+
+.benefitCheck {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.historyTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 28px;
+  font-size: 14px;
+}
+
+.historyTable th,
+.historyTable td {
+  border: 1px solid var(--color-border);
+  padding: 12px 10px;
+  text-align: left;
+}
+
+.historyTable th {
+  background: var(--color-bg);
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
+.historyTable td {
+  color: var(--color-text-main);
+}
+
+.pointsPositive {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.pointsNegative {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.waysContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.wayCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  transition: box-shadow 0.2s;
+}
+
+.wayCard:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.wayIcon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.wayTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 4px;
+}
+
+.wayDesc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.catalogGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.rewardCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.rewardIcon {
+  font-size: 32px;
+}
+
+.rewardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.rewardPoints {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.redeemBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--color-primary, #7c3aed);
+  color: #fff;
+  transition: opacity 0.2s;
+}
+
+.redeemBtn:hover {
+  opacity: 0.9;
+}
+
+.redeemBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.redemptionHistory {
+  margin-top: 8px;
+}
+
+.redemptionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+  color: var(--color-text-main);
+}
+
+.redemptionItem:last-child {
+  border-bottom: none;
+}
+
+.redemptionName {
+  font-weight: 600;
+}
+
+.redemptionDate {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--color-text-main);
+  color: var(--color-bg);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: toastIn 0.3s ease;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}

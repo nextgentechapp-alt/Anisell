@@ -1,0 +1,72 @@
+@import '@/styles/variables.css';
+
+.card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  transition: var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background-color: var(--color-background);
+}
+
+.data {
+  flex: 1;
+}
+
+.label {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-1);
+}
+
+.value {
+  display: block;
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-text-main);
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: var(--spacing-4);
+    gap: var(--spacing-3);
+  }
+
+  .iconWrapper {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .value {
+    font-size: var(--font-size-xl);
+  }
+
+  .label {
+    font-size: 10px;
+  }
+}

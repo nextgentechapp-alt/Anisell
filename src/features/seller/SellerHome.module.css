@@ -1,0 +1,153 @@
+@import '@/styles/variables.css';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-6);
+}
+
+.statCard {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  transition: var(--transition-normal);
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-3);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-text-main);
+}
+
+.chartCard {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-8);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+.chartTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  margin-bottom: var(--spacing-6);
+}
+
+.chartArea {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-4);
+  height: 160px;
+  padding-bottom: var(--spacing-6);
+}
+
+.chartBarGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.chartBar {
+  width: 100%;
+  background-color: var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-normal);
+}
+
+.chartBarActive {
+  background-color: var(--color-primary);
+}
+
+.chartLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.topProductsCard {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-8);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+.productList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.productItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+  background-color: var(--color-background);
+  border-radius: var(--radius-lg);
+  transition: var(--transition-fast);
+}
+
+.productItem:hover {
+  background-color: var(--color-primary-light);
+}
+
+.productImage {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.productInfo {
+  flex: 1;
+}
+
+.productName {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.productMeta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.productStats {
+  text-align: right;
+}
+
+.salesValue {
+  font-size: var(--font-size-base);
+  font-weight: 800;
+  color: var(--color-primary);
+}

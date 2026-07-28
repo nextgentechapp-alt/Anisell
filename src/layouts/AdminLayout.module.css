@@ -1,0 +1,269 @@
+@import '@/styles/variables.css';
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: row;
+  background-color: #f8fafc;
+}
+
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #fff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.5px;
+}
+
+.brandRole {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  width: 100%;
+  border-radius: 10px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.navItem:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.navItemActive {
+  background-color: #eff6ff;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebarFooter {
+  padding: 24px 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.adminProfile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.profileName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.profileRole {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevents flex blowout */
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.topBar {
+  padding: 24px 40px 0 40px;
+  display: flex;
+  justify-content: flex-end;
+  background: #f8fafc;
+}
+
+.searchBar {
+  position: relative;
+  width: 320px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.searchInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.content {
+  padding: 24px 40px 40px 40px;
+  flex: 1;
+}
+
+/* Hide toggle on desktop */
+.menuToggle {
+  display: none;
+}
+
+/* -------------------------------------------------------------------------
+   RESPONSIVE DESIGN BREAKPOINTS
+   ------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -280px;
+    height: 100vh;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+  }
+
+  .sidebarActive {
+    left: 0 !important;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 90;
+  }
+
+  .main {
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .topBar {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .menuToggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    color: #475569;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.2s ease;
+  }
+
+  .menuToggle:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+
+  .searchBar {
+    width: 220px;
+  }
+
+  .content {
+    padding: 20px;
+  }
+}
+

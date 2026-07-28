@@ -1,0 +1,384 @@
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.clearBtn {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #dc2626;
+  background: none;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.clearBtn:hover {
+  background: #fef2f2;
+}
+
+.maxWarning {
+  font-size: 0.813rem;
+  color: var(--color-text-muted);
+  background: var(--color-bg-hover);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.addBtn {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: none;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.addBtn:hover {
+  background: var(--color-bg-hover);
+}
+
+.addBtnDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dropdownWrapper {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  width: 280px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 4px 0;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-text-main);
+  transition: background 0.1s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.dropdownItem:hover {
+  background: var(--color-bg-hover);
+}
+
+.dropdownThumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-bg);
+}
+
+.dropdownThumbPlaceholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: var(--color-bg);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.tableHeader {
+  background: var(--color-bg);
+}
+
+.tableHeaderCell {
+  padding: 16px 12px;
+  text-align: center;
+  vertical-align: top;
+  border-bottom: 2px solid var(--color-border);
+  min-width: 180px;
+}
+
+.tableHeaderCell:first-child {
+  min-width: 120px;
+  text-align: left;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--color-bg);
+}
+
+.tableHeaderInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.productImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--color-bg);
+}
+
+.productTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.removeBtn {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  color: #dc2626;
+  background: none;
+  border: 1px solid #dc2626;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.removeBtn:hover {
+  background: #fef2f2;
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableLabel {
+  padding: 12px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: var(--color-bg);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.tableCell {
+  padding: 12px;
+  font-size: 0.875rem;
+  color: var(--color-text-main);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.tableCellHighlight {
+  background: #fef2f2;
+}
+
+.price {
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.mrp {
+  font-size: 0.813rem;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  margin-left: 4px;
+}
+
+.discount {
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: #16a34a;
+  margin-left: 6px;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: #f59e0b;
+}
+
+.ratingCount {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.stockInStock {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.stockOutOfStock {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.specList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.813rem;
+  color: var(--color-text-main);
+}
+
+.specItem {
+  padding: 2px 0;
+}
+
+.specLabel {
+  color: var(--color-text-muted);
+  margin-right: 4px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.688rem;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badgeFlashSale {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.badgeNew {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.badgeBestSeller {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 4px;
+  color: var(--color-text-main);
+}
+
+.emptyHint {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px 8px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+
+  .addBtn,
+  .clearBtn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .tableHeaderCell {
+    min-width: 150px;
+  }
+
+  .tableHeaderCell:first-child {
+    min-width: 90px;
+  }
+
+  .productImage {
+    width: 60px;
+    height: 60px;
+  }
+}

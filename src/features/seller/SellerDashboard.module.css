@@ -1,0 +1,94 @@
+@import '@/styles/variables.css';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.header {
+  margin-top: var(--spacing-4);
+  margin-bottom: var(--spacing-8);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--spacing-4);
+}
+
+.compactHeader {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-4) 0;
+}
+
+.headerInfo h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-text-main);
+  margin-bottom: var(--spacing-2);
+}
+
+.headerInfo p {
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+.toggles {
+  display: flex;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.toggleBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toggleBtnActive {
+  background-color: white;
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggleBtnInactive {
+  background-color: transparent;
+  color: var(--color-text-muted);
+}
+
+.mobileMenuTrigger {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobileMenuTrigger {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .headerInfo h1 {
+    font-size: 24px;
+  }
+
+  .toggles {
+    width: 100%;
+  }
+
+  .toggleBtn {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+  }
+}

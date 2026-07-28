@@ -1,0 +1,55 @@
+@import '@/styles/variables.css';
+
+.wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  background-color: var(--color-background);
+  padding: var(--spacing-4);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-main);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background-color: var(--color-background);
+}
+
+.table tr.clickableRow {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.table tr.clickableRow:hover {
+  background: #f8fafc;
+}
+
+.status {
+  text-align: center;
+  padding: var(--spacing-8);
+  color: var(--color-text-muted);
+}

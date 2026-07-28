@@ -1,0 +1,226 @@
+.container {
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+.header {
+  margin-bottom: 32px;
+}
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+.subtitle {
+  color: #64748b;
+  font-size: 15px;
+}
+.formSection {
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 20px;
+}
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.dropzone:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+.uploadLabel {
+  color: #3b82f6;
+  font-weight: 600;
+}
+.previewGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+.previewItem {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  background: #f1f5f9;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.previewItem:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pdfPreview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff1f2;
+  color: #e11d48;
+}
+.previewOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: white;
+}
+.previewItem:hover .previewOverlay {
+  opacity: 1;
+}
+
+/* Lightbox Modal */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.lightboxContent {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  background: white;
+  overflow: hidden;
+}
+.lightboxImg {
+  max-width: 100%;
+  max-height: 80vh;
+  display: block;
+}
+.lightboxPdf {
+  width: 80vw;
+  height: 80vh;
+  border: none;
+}
+.closeLightbox {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.closeLightbox:hover {
+  background: #ef4444;
+  transform: rotate(90deg);
+}
+.submitBtn {
+  width: 100%;
+  padding: 16px;
+  background: #2563eb;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.submitBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+.submitBtn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+.loaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btnUploading {
+  background: #334155 !important;
+  cursor: wait;
+}
+
+.error {
+  color: #ef4444;
+  background: #fef2f2;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 500;
+  border: 1px solid #fee2e2;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}

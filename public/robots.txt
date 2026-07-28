@@ -1,0 +1,63 @@
+# =========================================================================
+# ANISELL PET MARKETPLACE - ROBOTS.TXT
+# Centralized Crawler Policy & Search Engine Directives
+# =========================================================================
+
+User-agent: *
+
+# -------------------------------------------------------------------------
+# 1. ALLOWED PUBLIC SECTOR (Indexable & Crawlable)
+# Public routes that bring commercial/informational organic traffic.
+# -------------------------------------------------------------------------
+Allow: /                                  # Home Page
+Allow: /result                            # Marketplace Search Directory
+Allow: /product/                          # Individual Pet Product Listing Pages
+Allow: /seller-register                   # Merchant Recruiting Landing Page
+
+# -------------------------------------------------------------------------
+# 2. DISALLOWED BUYER/CUSTOMER SECTOR (Sensitive Private Data Block)
+# Blocks buyer pages that expose personal identities, orders, or locations.
+# -------------------------------------------------------------------------
+Disallow: /profile/                       # Buyer Profile Dashboard Index
+Disallow: /profile/order/                 # Transaction Order Details
+Disallow: /profile/edit                   # Personal Details Modification Form
+Disallow: /profile/addresses              # Buyer Physical Delivery Addresses
+Disallow: /profile/wishlist               # Buyer Favorites & Saved Lists
+Disallow: /profile/settings               # Buyer Account Security Settings
+Disallow: /buyer-onboarding               # Customer Registration Funnel
+Disallow: /checkout/                      # Secure Checkout and Payment Portals
+
+# -------------------------------------------------------------------------
+# 3. DISALLOWED SELLER/MERCHANT SECTOR (Sensitive Corporate Data Block)
+# Blocks internal shop analytics, inventory lists, and customer orders.
+# -------------------------------------------------------------------------
+Disallow: /seller-profile/                # Seller Dashboard Portal Index
+Disallow: /seller-profile/products        # Internal Merchant Product Listings
+Disallow: /seller-profile/orders          # Customer Sales Orders Database
+Disallow: /seller-profile/reviews         # Merchant Service Rating Logs
+Disallow: /seller-profile/edit            # Business License / Identity Forms
+Disallow: /seller-profile/settings        # Seller Banking/Payment Settings
+Disallow: /seller-onboarding              # Merchant KYC Onboarding Phase
+
+# -------------------------------------------------------------------------
+# 4. DISALLOWED ADMINISTRATIVE CONTROL PORTAL (Critical System Protection)
+# Complete search exclusion of the backend administration dashboard.
+# -------------------------------------------------------------------------
+Disallow: /admin/                         # Localized Admin Dashboard Root
+Disallow: /admin                          # Dynamic Admin Redirect Gateway
+
+# -------------------------------------------------------------------------
+# 5. DISALLOWED SYSTEM & PARAMETRIC WASTAGE (Crawl Budget Optimization)
+# Block search pages with dynamic parameters to prevent duplicate pages.
+# -------------------------------------------------------------------------
+Disallow: /login                          # Prevent Indexation of Login Pages
+Disallow: /*?*filter=                     # Prevent duplicate pages from faceted filtering
+Disallow: /*?*sort=                       # Prevent indexing of sorted listings
+Disallow: /*?*search=                     # Block internal search query index loops
+Disallow: /api/                           # Block internal backend API calls
+
+# -------------------------------------------------------------------------
+# 6. DYNAMIC SITEMAP INFRASTRUCTURE
+# Directs major search engine bots to indexation sitemaps.
+# -------------------------------------------------------------------------
+Sitemap: https://anisell.in/sitemap.xml
