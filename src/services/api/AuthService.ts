@@ -10,12 +10,18 @@ import {
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import type { User, Seller, Buyer } from '@/types';
 
+const IS_MOCK = typeof window !== 'undefined' &&
+  (import.meta.env.VITE_ENABLE_MOCK_DATA === 'true' || !import.meta.env.FIREBASE_API_KEY);
+
 /**
  * Platform Authentication Service Layer.
  * Centralizes all Firebase Identity Management and User Profile Synchronization.
  */
 export const AuthService = {
   async loginWithEmail(email: string, pass: string): Promise<User | null> {
+    if (IS_MOCK) {
+      return { uid: 'mock-uid', email, role: 'buyer', displayName: 'Mock User', photoURL: '', createdAt: new Date().toISOString() };
+    }
     const result = await signInWithEmailAndPassword(auth, email, pass);
     const userRef = doc(db, 'users', result.user.uid);
     const userDoc = await getDoc(userRef);
@@ -29,13 +35,10 @@ export const AuthService = {
      if (!isAdminEmail(email)) {
         throw new Error('Access Denied: Email not in platform administrative registry.');
      }
-     
-     // Admin credentials are validated via Firebase Auth, but we bypass Firestore data retrieval
-     // This ensures zero usage of 'users' or 'sellers' collections for admin profiles
+     if (IS_MOCK) {
+       return { uid: 'mock-admin', email, displayName: 'System Administrator', photoURL: 'https://cdn-icons-png.flaticon.com/512/6024/6024190.png', role: 'admin' as const };
+     }
      const result = await signInWithEmailAndPassword(auth, email, pass);
-     
-     // Return a synthetic admin profile to satisfy internal state requirements 
-     // following strict platform isolation rules
      return {
         uid: result.user.uid,
         email: result.user.email || '',
@@ -46,6 +49,9 @@ export const AuthService = {
   },
 
   async registerWithEmail(email: string, pass: string, role: 'buyer' | 'seller'): Promise<User> {
+    if (IS_MOCK) {
+      return { uid: 'mock-uid', email, role, displayName: 'Mock User', photoURL: '', createdAt: new Date().toISOString() };
+    }
     const result = await createUserWithEmailAndPassword(auth, email, pass);
     const userId = result.user.uid;
     const initialProfile: User = {
@@ -68,6 +74,17 @@ export const AuthService = {
   },
 
   async loginWithGoogle(requestedRole: 'buyer' | 'seller'): Promise<{ user?: User; sellerData?: Seller | null; buyerData?: Buyer | null; requiresConfirmation?: boolean; pendingUserData?: User }> {
+    if (IS_MOCK) {
+      const email = import.meta.env.VITE_ADMIN_EMAILS || 'admin@anisell.com';
+      const mockUser: User = {
+        uid: 'mock-admin-uid',
+        email,
+        displayName: 'System Administrator',
+        photoURL: 'https://cdn-icons-png.flaticon.com/512/6024/6024190.png',
+        role: 'admin'
+      };
+      return { user: mockUser, sellerData: null, buyerData: null };
+    }
     const result = await signInWithPopup(auth, googleProvider);
     const firebaseUser = result.user;
     
@@ -101,7 +118,6 @@ export const AuthService = {
     let finalSellerData: Seller | null = null;
     let finalBuyerData: Buyer | null = null;
 
-    // Fetch or Initialize Buyer specific record
     if (finalRole === 'buyer') {
        const buyerRef = doc(db, 'buyers', firebaseUser.uid);
        const buyerSnap = await getDoc(buyerRef);
@@ -112,7 +128,6 @@ export const AuthService = {
        }
     }
 
-    // Fetch or Initialize Merchant specific record
     if (finalRole === 'seller') {
        const sellerRef = doc(db, 'sellers', firebaseUser.uid);
        const sellerSnap = await getDoc(sellerRef);
@@ -235,6 +250,7 @@ export const AuthService = {
   },
 
   async logout() {
+    if (IS_MOCK) return;
     await signOut(auth);
   }
 };
