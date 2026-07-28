@@ -3,17 +3,14 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-const API_KEY = import.meta.env.FIREBASE_API_KEY || 'mock-api-key';
-const PROJECT_ID = import.meta.env.FIREBASE_PROJECT_ID || 'anisell-mock';
-
 const firebaseConfig = {
-  apiKey: API_KEY,
-  authDomain: import.meta.env.FIREBASE_AUTH_DOMAIN || `${PROJECT_ID}.firebaseapp.com`,
-  projectId: PROJECT_ID,
-  storageBucket: import.meta.env.FIREBASE_STORAGE_BUCKET || `${PROJECT_ID}.appspot.com`,
-  messagingSenderId: import.meta.env.FIREBASE_MESSAGING_SENDER_ID || '000000000000',
-  appId: import.meta.env.FIREBASE_APP_ID || '1:000000000000:web:0000000000000000',
-  measurementId: import.meta.env.FIREBASE_MEASUREMENT_ID || 'G-0000000000'
+  apiKey: "AIzaSyACcv4PO4kjECLr0ex9r179mzwuyZ0q-ME",
+  authDomain: "anisell-ab8e8.firebaseapp.com",
+  projectId: "anisell-ab8e8",
+  storageBucket: "anisell-ab8e8.firebasestorage.app",
+  messagingSenderId: "989026972047",
+  appId: "1:989026972047:web:aa797d933f2fe961581bfa",
+  measurementId: "G-9E4QBB4DVJ"
 };
 
 const app = initializeApp(firebaseConfig);

@@ -10,18 +10,12 @@ import {
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import type { User, Seller, Buyer } from '@/types';
 
-const IS_MOCK = typeof window !== 'undefined' &&
-  (import.meta.env.VITE_ENABLE_MOCK_DATA === 'true' || !import.meta.env.FIREBASE_API_KEY);
-
 /**
  * Platform Authentication Service Layer.
  * Centralizes all Firebase Identity Management and User Profile Synchronization.
  */
 export const AuthService = {
   async loginWithEmail(email: string, pass: string): Promise<User | null> {
-    if (IS_MOCK) {
-      return { uid: 'mock-uid', email, role: 'buyer', displayName: 'Mock User', photoURL: '', createdAt: new Date().toISOString() };
-    }
     const result = await signInWithEmailAndPassword(auth, email, pass);
     const userRef = doc(db, 'users', result.user.uid);
     const userDoc = await getDoc(userRef);
@@ -35,9 +29,6 @@ export const AuthService = {
      if (!isAdminEmail(email)) {
         throw new Error('Access Denied: Email not in platform administrative registry.');
      }
-     if (IS_MOCK) {
-       return { uid: 'mock-admin', email, displayName: 'System Administrator', photoURL: 'https://cdn-icons-png.flaticon.com/512/6024/6024190.png', role: 'admin' as const };
-     }
      const result = await signInWithEmailAndPassword(auth, email, pass);
      return {
         uid: result.user.uid,
@@ -49,9 +40,6 @@ export const AuthService = {
   },
 
   async registerWithEmail(email: string, pass: string, role: 'buyer' | 'seller'): Promise<User> {
-    if (IS_MOCK) {
-      return { uid: 'mock-uid', email, role, displayName: 'Mock User', photoURL: '', createdAt: new Date().toISOString() };
-    }
     const result = await createUserWithEmailAndPassword(auth, email, pass);
     const userId = result.user.uid;
     const initialProfile: User = {
@@ -74,17 +62,6 @@ export const AuthService = {
   },
 
   async loginWithGoogle(requestedRole: 'buyer' | 'seller'): Promise<{ user?: User; sellerData?: Seller | null; buyerData?: Buyer | null; requiresConfirmation?: boolean; pendingUserData?: User }> {
-    if (IS_MOCK) {
-      const email = import.meta.env.VITE_ADMIN_EMAILS || 'admin@anisell.com';
-      const mockUser: User = {
-        uid: 'mock-admin-uid',
-        email,
-        displayName: 'System Administrator',
-        photoURL: 'https://cdn-icons-png.flaticon.com/512/6024/6024190.png',
-        role: 'admin'
-      };
-      return { user: mockUser, sellerData: null, buyerData: null };
-    }
     const result = await signInWithPopup(auth, googleProvider);
     const firebaseUser = result.user;
     
@@ -250,7 +227,6 @@ export const AuthService = {
   },
 
   async logout() {
-    if (IS_MOCK) return;
     await signOut(auth);
   }
 };

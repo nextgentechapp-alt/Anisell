@@ -1,7 +1,7 @@
 import type { PetProduct, PetVerseCategorySlug } from '@/types/petverse';
 import { PETVERSE_PRODUCTS, PETVERSE_CATEGORIES } from '@/data/petverseCatalog';
 
-const IS_MOCK = import.meta.env.VITE_ENABLE_MOCK_DATA === 'true' || !import.meta.env.FIREBASE_API_KEY;
+const IS_MOCK = import.meta.env.VITE_ENABLE_MOCK_DATA === 'true';
 
 let firestoreDb: typeof import('firebase/firestore') | null = null;
 let dbInstance: ReturnType<typeof import('firebase/firestore').getFirestore> | null = null;
