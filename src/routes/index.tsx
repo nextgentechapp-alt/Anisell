@@ -120,11 +120,20 @@ const mainRouter = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: isVercel() ? <Navigate to="/" replace /> : <Navigate to={getAdminSubdomainUrl()} replace />,
+    element: isVercel() ? <Navigate to="/admin/dashboard" replace /> : <Navigate to={getAdminSubdomainUrl()} replace />,
   },
   {
     path: '/admin/*',
-    element: isVercel() ? <Navigate to="/" replace /> : <Navigate to={getAdminSubdomainUrl()} replace />,
+    element: isVercel() ? (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <Suspense fallback={<Loading />}>
+          <AdminLayout />
+        </Suspense>
+      </ProtectedRoute>
+    ) : (
+      <Navigate to={getAdminSubdomainUrl()} replace />
+    ),
+    children: isVercel() ? adminRoutes : undefined,
   },
   {
     path: '*',
