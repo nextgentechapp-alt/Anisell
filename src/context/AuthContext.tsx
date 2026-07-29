@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         if (firebaseUser) {
           const userEmail = firebaseUser.email;
-          const adminEmails = import.meta.env.VITE_ADMIN_EMAILS || 'admin@anisell.com';
+          const adminEmails = import.meta.env.VITE_ADMIN_EMAILS || 'anisellns27@gmail.com,anisell.admin@gmail.com';
           console.log('[Auth] Firebase user email:', userEmail, '| VITE_ADMIN_EMAILS:', adminEmails);
           const isUserAdmin = isAdminEmail(userEmail);
           

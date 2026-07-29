@@ -31,7 +31,7 @@ export const isAdminSubdomain = (): boolean => {
 
 export const isAdminEmail = (email: string | null | undefined): boolean => {
    if (!email) return false;
-   const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'admin@anisell.com').split(',');
+   const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'anisellns27@gmail.com,anisell.admin@gmail.com').split(',');
    return adminEmails.includes(email);
 };
 
