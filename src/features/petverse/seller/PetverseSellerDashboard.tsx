@@ -2,11 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { PetProductService } from '@/services/api/petverse/PetProductService';
 import { PetOrderService } from '@/services/api/petverse/PetOrderService';
-import { PETVERSE_CATEGORIES } from '@/data/petverseCatalog';
-import type { PetOrder, PetProduct, PetVerseCategorySlug } from '@/types/petverse';
+import type { PetOrder, PetProduct } from '@/types/petverse';
 import '@/features/petverse/petverse.css';
 
-type Tab = 'listings' | 'add' | 'orders' | 'earnings';
+type Tab = 'listings' | 'orders' | 'earnings';
 
 const PetverseSellerDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -14,11 +13,6 @@ const PetverseSellerDashboard: React.FC = () => {
   const [allProducts, setAllProducts] = useState<PetProduct[]>([]);
   const [allOrders, setAllOrders] = useState<PetOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const [draft, setDraft] = useState({
-    title: '', categorySlug: 'accessories' as PetVerseCategorySlug, brand: '', price: 0, mrp: 0, stock: 0, animalType: 'All', image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600', description: '',
-  });
 
   const loadData = async () => {
     setLoading(true);
@@ -44,47 +38,6 @@ const PetverseSellerDashboard: React.FC = () => {
       return sum + mine.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
     }, 0);
   }, [myOrders, myProductIds]);
-
-  const handleAddProduct = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-    setSaving(true);
-    try {
-      const mrp = draft.mrp || draft.price;
-      await PetProductService.createProduct({
-        title: draft.title,
-        slug: draft.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        categorySlug: draft.categorySlug,
-        brand: draft.brand || 'Independent Seller',
-        price: draft.price,
-        mrp,
-        discountPercent: mrp > draft.price ? Math.round(((mrp - draft.price) / mrp) * 100) : 0,
-        rating: 0,
-        ratingCount: 0,
-        stock: draft.stock,
-        images: [draft.image],
-        description: draft.description,
-        specifications: [{ label: 'Sold By', value: user.displayName || 'AniSell Seller' }],
-        variants: [{ id: `var-${Date.now()}`, label: 'Standard', priceDelta: 0, stock: draft.stock }],
-        deliveryEtaDays: 4,
-        tags: [draft.categorySlug],
-        isFeatured: false,
-        isBestSeller: false,
-        isNewArrival: true,
-        isFlashSale: false,
-        animalType: draft.animalType,
-        ageGroup: 'all-ages',
-        sellerId: user.uid,
-        sellerName: user.displayName || 'AniSell Seller',
-        createdAt: new Date().toISOString(),
-      });
-      setDraft({ title: '', categorySlug: 'accessories', brand: '', price: 0, mrp: 0, stock: 0, animalType: 'All', image: draft.image, description: '' });
-      await loadData();
-      setTab('listings');
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Remove this listing?')) return;
@@ -112,7 +65,7 @@ const PetverseSellerDashboard: React.FC = () => {
       <p className="pv-section-subtitle" style={{ marginBottom: 20 }}>Welcome back, {user.displayName || 'Seller'}.</p>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-        {(['listings', 'add', 'orders', 'earnings'] as Tab[]).map((t) => (
+        {(['listings', 'orders', 'earnings'] as Tab[]).map((t) => (
           <button key={t} type="button" className={`pv-variant-chip ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)} style={{ textTransform: 'capitalize' }}>
             {t}
           </button>
@@ -136,26 +89,6 @@ const PetverseSellerDashboard: React.FC = () => {
             </div>
           ))}
         </div>
-      )}
-
-      {tab === 'add' && (
-        <form className="pv-form-card" onSubmit={handleAddProduct}>
-          <h3>Upload New Product</h3>
-          <div className="pv-form-grid">
-            <input className="pv-full-span" placeholder="Product Title" required value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
-            <select value={draft.categorySlug} onChange={(e) => setDraft({ ...draft, categorySlug: e.target.value as PetVerseCategorySlug })}>
-              {PETVERSE_CATEGORIES.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
-            </select>
-            <input placeholder="Brand" value={draft.brand} onChange={(e) => setDraft({ ...draft, brand: e.target.value })} />
-            <input type="number" placeholder="Price (₹)" value={draft.price} onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) })} />
-            <input type="number" placeholder="MRP (₹)" value={draft.mrp} onChange={(e) => setDraft({ ...draft, mrp: Number(e.target.value) })} />
-            <input type="number" placeholder="Stock" value={draft.stock} onChange={(e) => setDraft({ ...draft, stock: Number(e.target.value) })} />
-            <input placeholder="Animal Type" value={draft.animalType} onChange={(e) => setDraft({ ...draft, animalType: e.target.value })} />
-            <input className="pv-full-span" placeholder="Image URL" value={draft.image} onChange={(e) => setDraft({ ...draft, image: e.target.value })} />
-            <textarea className="pv-full-span" placeholder="Description" rows={3} value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} style={{ padding: 10, borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }} />
-          </div>
-          <button type="submit" className="pv-btn pv-btn-primary" style={{ marginTop: 12 }} disabled={saving}>{saving ? 'Publishing…' : 'Publish Product'}</button>
-        </form>
       )}
 
       {tab === 'orders' && (
