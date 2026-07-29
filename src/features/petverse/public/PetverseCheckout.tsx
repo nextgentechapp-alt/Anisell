@@ -121,7 +121,7 @@ const PetverseCheckout: React.FC = () => {
         deliveryFee,
         total,
         status: 'placed',
-        couponCode: appliedCoupon?.code,
+        ...(appliedCoupon?.code ? { couponCode: appliedCoupon.code } : {}),
         shippingAddress: address,
         paymentMethod,
         paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
