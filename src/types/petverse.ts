@@ -144,7 +144,8 @@ export interface PetOrder {
   couponCode?: string;
   shippingAddress: PetAddress;
   paymentMethod: 'cod' | 'card' | 'upi' | 'netbanking';
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentStatus: 'pending' | 'pending_verification' | 'paid' | 'failed' | 'refunded';
+  utr?: string;
   placedAt: string;
   statusHistory: { status: PetOrderStatus; at: string }[];
   trackingId?: string;

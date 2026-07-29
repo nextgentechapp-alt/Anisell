@@ -9,6 +9,8 @@ import { PETVERSE_ROUTES } from '@/constants/petverseRoutes';
 import type { PetAddress, PetOrder, PetOrderItem, PetProduct } from '@/types/petverse';
 import '@/features/petverse/petverse.css';
 
+const ADMIN_PHONE = import.meta.env.VITE_ADMIN_PHONE || '';
+
 const PetverseCheckout: React.FC = () => {
   const { user } = useAuth();
   const { items, clearCart } = usePetverseCart();
@@ -26,6 +28,8 @@ const PetverseCheckout: React.FC = () => {
     pincode: '',
   });
   const [paymentMethod, setPaymentMethod] = useState<PetOrder['paymentMethod']>('cod');
+  const [utr, setUtr] = useState('');
+  const [copiedUpi, setCopiedUpi] = useState(false);
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<(typeof PETVERSE_COUPONS)[number] | null>(null);
   const [couponError, setCouponError] = useState('');
@@ -124,7 +128,8 @@ const PetverseCheckout: React.FC = () => {
         ...(appliedCoupon?.code ? { couponCode: appliedCoupon.code } : {}),
         shippingAddress: address,
         paymentMethod,
-        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
+        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'pending_verification',
+        ...(paymentMethod === 'upi' && utr ? { utr } : {}),
         placedAt: now,
         statusHistory: [{ status: 'placed', at: now }],
         trackingId: `PV${Date.now().toString().slice(-8)}`,
@@ -132,6 +137,12 @@ const PetverseCheckout: React.FC = () => {
 
       const orderId = await PetOrderService.placeOrder(order);
       clearCart();
+      // Notify admin via WhatsApp
+      if (ADMIN_PHONE) {
+        const itemsSummary = orderItems.map(i => `${i.title} x${i.quantity}`).join(', ');
+        const msg = `New Order!\nOrder: ${orderId}\nBuyer: ${user.displayName || user.uid}\nItems: ${itemsSummary}\nTotal: ₹${total}\nPayment: ${paymentMethod}\nAddress: ${address.line1}, ${address.city}`;
+        window.open(`https://wa.me/${ADMIN_PHONE.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
       navigate(PETVERSE_ROUTES.orderPath(orderId));
     } finally {
       setPlacing(false);
@@ -181,12 +192,46 @@ const PetverseCheckout: React.FC = () => {
               <div
                 key={value}
                 className={`pv-payment-option ${paymentMethod === value ? 'active' : ''}`}
-                onClick={() => setPaymentMethod(value)}
+                onClick={() => { setPaymentMethod(value); if (value !== 'upi') setUtr(''); }}
               >
-                <input type="radio" checked={paymentMethod === value} onChange={() => setPaymentMethod(value)} />
+                <input type="radio" checked={paymentMethod === value} onChange={() => { setPaymentMethod(value); if (value !== 'upi') setUtr(''); }} />
                 {label}
               </div>
             ))}
+            {paymentMethod === 'upi' && (
+              <div style={{ marginTop: 16, padding: 16, background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                <p style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>Pay via UPI</p>
+                <div style={{ textAlign: 'center', marginBottom: 12 }}>
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('upi://pay?pa=' + encodeURIComponent(import.meta.env.VITE_UPI_ID || 'subikshan182006-1@oksbi') + '&pn=AniSell&am=' + total + '&cu=INR')}`}
+                    alt="UPI QR Code"
+                    style={{ width: 200, height: 200, borderRadius: 8 }}
+                  />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <code style={{ flex: 1, padding: '8px 12px', background: '#fff', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}>{import.meta.env.VITE_UPI_ID || 'subikshan182006-1@oksbi'}</code>
+                  <button
+                    type="button"
+                    className="pv-btn pv-btn-outline"
+                    style={{ padding: '6px 12px', fontSize: 12 }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(import.meta.env.VITE_UPI_ID || 'subikshan182006-1@oksbi');
+                      setCopiedUpi(true);
+                      setTimeout(() => setCopiedUpi(false), 2000);
+                    }}
+                  >
+                    {copiedUpi ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+                <input
+                  placeholder="Enter UTR / Transaction ID"
+                  value={utr}
+                  onChange={(e) => setUtr(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, boxSizing: 'border-box' }}
+                />
+                <p style={{ fontSize: 12, color: '#6b7280', marginTop: 6 }}>Enter the UTR number from your UPI payment to complete the order.</p>
+              </div>
+            )}
           </div>
 
           <div className="pv-form-card">
@@ -218,7 +263,7 @@ const PetverseCheckout: React.FC = () => {
             type="button"
             className="pv-btn pv-btn-primary pv-btn-block"
             style={{ marginTop: 16 }}
-            disabled={!addressComplete || placing}
+            disabled={!addressComplete || (paymentMethod === 'upi' && !utr) || placing}
             onClick={handlePlaceOrder}
           >
             {placing ? 'Placing Order…' : !user ? 'Login to Place Order' : 'Place Order'}
