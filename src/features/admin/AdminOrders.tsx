@@ -162,12 +162,12 @@ const AdminOrders: React.FC = () => {
     }
   };
 
-  const orderColumns = [
+  const orderColumns = tab === 'main' ? [
     { 
       header: 'Fulfillment Reference', 
       key: 'orderId',
       render: (o: any) => (
-        <div style={{ fontWeight: 800, color: '#1e293b', fontSize: '14px' }}>#{o.orderId.substring(0, 8).toUpperCase()}</div>
+        <div style={{ fontWeight: 800, color: '#1e293b', fontSize: '14px' }}>#{(o.orderId || '').substring(0, 8).toUpperCase()}</div>
       )
     },
     { 
@@ -210,7 +210,7 @@ const AdminOrders: React.FC = () => {
       header: 'Gross Value', 
       key: 'revenue', 
       render: (o: any) => (
-        <div style={{ fontWeight: 800, color: '#10b981', fontSize: '15px' }}>₹{o.amount.toLocaleString()}</div>
+        <div style={{ fontWeight: 800, color: '#10b981', fontSize: '15px' }}>₹{(o.amount || 0).toLocaleString()}</div>
       )
     },
     { 
@@ -240,6 +240,57 @@ const AdminOrders: React.FC = () => {
            'PENDING': 'neutral'
          };
          return <Badge label={o.status || 'PENDING'} variant={variants[o.status] || 'neutral'} />;
+      }
+    }
+  ] : [
+    {
+      header: 'Order Ref',
+      key: 'trackingId',
+      render: (o: any) => (
+        <div style={{ fontWeight: 800, color: '#1e293b', fontSize: '14px' }}>#{(o.trackingId || o.id || '').substring(0, 8).toUpperCase()}</div>
+      )
+    },
+    {
+      header: 'Buyer',
+      key: 'buyerName',
+      render: (o: any) => (
+        <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '14px' }}>{o.shippingAddress?.fullName || 'N/A'}</div>
+      )
+    },
+    {
+      header: 'Items',
+      key: 'items',
+      render: (o: any) => (
+        <div style={{ fontWeight: 600, color: '#475569', fontSize: '13px' }}>{(o.items || []).length} item(s)</div>
+      )
+    },
+    {
+      header: 'Total',
+      key: 'total',
+      render: (o: any) => (
+        <div style={{ fontWeight: 800, color: '#10b981', fontSize: '15px' }}>₹{(o.total || 0).toLocaleString()}</div>
+      )
+    },
+    {
+      header: 'Payment',
+      key: 'paymentStatus',
+      render: (o: any) => (
+        <Badge label={o.paymentStatus === 'paid' ? 'Paid' : o.paymentStatus === 'pending_verification' ? 'UTR Pending' : o.paymentMethod === 'cod' ? 'COD' : o.paymentStatus || 'N/A'} variant={o.paymentStatus === 'paid' ? 'success' : 'warning'} />
+      )
+    },
+    {
+      header: 'Status',
+      key: 'status',
+      render: (o: any) => {
+        const variants: any = {
+          'delivered': 'success',
+          'shipped': 'primary',
+          'confirmed': 'primary',
+          'out_for_delivery': 'warning',
+          'placed': 'neutral',
+          'cancelled': 'error'
+        };
+        return <Badge label={(o.status || '').replace(/_/g, ' ')} variant={variants[o.status] || 'neutral'} />;
       }
     }
   ];
