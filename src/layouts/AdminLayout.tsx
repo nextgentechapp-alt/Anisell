@@ -17,6 +17,7 @@ const AdminLayout: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [isDesktop, setIsDesktop] = React.useState(true);
+  const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/profile';
 
   React.useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth > 1024);
@@ -50,14 +51,14 @@ const AdminLayout: React.FC = () => {
   }
 
   const navItems = [
-    { path: '/profile', icon: <FiGrid />, label: 'Overview' },
-    { path: '/profile/users', icon: <FiUsers />, label: 'User Management' },
-    { path: '/profile/sellers', icon: <FiBriefcase />, label: 'Seller Directory' },
-    { path: '/profile/products', icon: <FiShoppingBag />, label: 'Product Control' },
-    { path: '/profile/orders', icon: <FiArchive />, label: 'Order Tracking' },
-    { path: '/profile/payments', icon: <FiDollarSign />, label: 'Payments & Revenue' },
-    { path: '/profile/analytics', icon: <FiPieChart />, label: 'Platform Analytics' },
-    { path: '/profile/settings', icon: <FiBell />, label: 'Alerts & Settings' },
+    { path: `${basePath}`, icon: <FiGrid />, label: 'Overview' },
+    { path: `${basePath}/users`, icon: <FiUsers />, label: 'User Management' },
+    { path: `${basePath}/sellers`, icon: <FiBriefcase />, label: 'Seller Directory' },
+    { path: `${basePath}/products`, icon: <FiShoppingBag />, label: 'Product Control' },
+    { path: `${basePath}/orders`, icon: <FiArchive />, label: 'Order Tracking' },
+    { path: `${basePath}/payments`, icon: <FiDollarSign />, label: 'Payments & Revenue' },
+    { path: `${basePath}/analytics`, icon: <FiPieChart />, label: 'Platform Analytics' },
+    { path: `${basePath}/settings`, icon: <FiBell />, label: 'Alerts & Settings' },
   ];
 
   return (

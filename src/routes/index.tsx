@@ -16,7 +16,6 @@ import { petverseRoutes } from './petverse.routes';
 // --- Portal Layouts ---
 const RootLayout = lazy(() => import('@/layouts/RootLayout'));
 const AdminLayout = lazy(() => import('@/layouts/AdminLayout'));
-const AdminLogin = lazy(() => import('@/features/admin/AdminLogin'));
 const SellerLayout = lazy(() => import('@/layouts/SellerLayout'));
 const PetverseLayout = lazy(() => import('@/layouts/PetverseLayout'));
 const SellerOnboarding = lazy(() => import('@/features/seller/SellerOnboarding'));
@@ -122,16 +121,6 @@ const mainRouter = createBrowserRouter([
   {
     path: '/admin',
     element: isVercel() ? <Navigate to="/admin/dashboard" replace /> : <Navigate to={getAdminSubdomainUrl()} replace />,
-  },
-  {
-    path: '/admin/login',
-    element: isVercel() ? (
-      <Suspense fallback={<Loading />}>
-        <AdminLogin />
-      </Suspense>
-    ) : (
-      <Navigate to={getAdminSubdomainUrl()} replace />
-    ),
   },
   {
     path: '/admin/*',

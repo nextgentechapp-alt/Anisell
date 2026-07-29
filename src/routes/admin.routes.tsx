@@ -20,6 +20,10 @@ export const adminRoutes: RouteObject[] = [
     element: <AdminDashboard />,
   },
   {
+    path: 'dashboard',
+    element: <AdminDashboard />,
+  },
+  {
     path: 'users',
     element: <AdminUsers />,
   },
