@@ -60,6 +60,13 @@ const AdminOrders: React.FC = () => {
       if (selectedOrder && selectedOrder.orderId === id) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
+
+      // Notify buyer via WhatsApp
+      if (buyerRecord.phone) {
+        const buyerName = users.find(u => u.uid === buyerId)?.displayName || 'Customer';
+        const msg = `Hi ${buyerName},\nYour order ${id.slice(0, 8).toUpperCase()} has been updated to: ${newStatus}\nThank you for shopping with AniSell!`;
+        window.open(`https://wa.me/${buyerRecord.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
     } catch (error) {
       console.error(`Failed to execute logistics update on order ${id}:`, error);
       alert('Network failure: Unable to transition order state.');
