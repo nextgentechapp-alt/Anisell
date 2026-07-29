@@ -1,5 +1,5 @@
 import { db } from '../firebase/config';
-import { doc, getDoc, updateDoc, collection, addDoc, getDocs, query, where, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, collection, addDoc, getDocs, query, where, writeBatch } from 'firebase/firestore';
 import type { Order, Buyer } from '@/types';
 import type { PaymentInfo } from '@/types/payment';
 
@@ -39,15 +39,19 @@ export const OrderService = {
     const buyerSnap = await getDoc(buyerRef);
 
     if (!buyerSnap.exists()) {
-      throw new Error('Buyer profile not found. Please complete your profile first.');
+      await setDoc(buyerRef, {
+        buyerId: orderData.buyerId,
+        phone: orderData.buyerPhone || '',
+        orders: [newOrder],
+        createdAt: new Date().toISOString(),
+      });
+    } else {
+      const buyerData = buyerSnap.data() as Buyer;
+      const existingOrders = buyerData.orders || [];
+      await updateDoc(buyerRef, {
+        orders: [...existingOrders, newOrder]
+      });
     }
-
-    const buyerData = buyerSnap.data() as Buyer;
-    const existingOrders = buyerData.orders || [];
-
-    await updateDoc(buyerRef, {
-      orders: [...existingOrders, newOrder]
-    });
 
     await addDoc(collection(db, 'orders'), {
       ...newOrder,
