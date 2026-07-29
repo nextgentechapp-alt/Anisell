@@ -104,6 +104,7 @@ const Checkout: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setOrderError('');
+    console.log('[Checkout] Submit clicked, paymentMethod:', paymentMethod, 'product:', product?.productId);
 
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       setOrderError('Please enter your full name.');

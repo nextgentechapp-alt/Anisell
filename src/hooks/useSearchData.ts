@@ -31,6 +31,12 @@ export const useSearchData = () => {
       }
     };
 
+    const onError = (collectionName: string) => (error: any) => {
+      console.error(`Firestore ${collectionName} sync error:`, error);
+      loadState[collectionName as keyof typeof loadState] = true;
+      checkComplete();
+    };
+
     // 1. Listen to Sellers
     const unsubscribeSellers = onSnapshot(query(collection(db, 'sellers')), (snapshot) => {
       setSellers(snapshot.docs.map(doc => ({
@@ -39,7 +45,7 @@ export const useSearchData = () => {
       })));
       loadState.sellers = true;
       checkComplete();
-    });
+    }, onError('sellers'));
 
     // 2. Listen to Products
     const unsubscribeProducts = onSnapshot(query(collection(db, 'products')), (snapshot) => {
@@ -49,7 +55,7 @@ export const useSearchData = () => {
       })));
       loadState.products = true;
       checkComplete();
-    });
+    }, onError('products'));
 
     // 3. Listen to Users
     const unsubscribeUsers = onSnapshot(query(collection(db, 'users')), (snapshot) => {
@@ -59,7 +65,7 @@ export const useSearchData = () => {
       })));
       loadState.users = true;
       checkComplete();
-    });
+    }, onError('users'));
 
     // 4. Listen to Buyers
     const unsubscribeBuyers = onSnapshot(query(collection(db, 'buyers')), (snapshot) => {
@@ -69,7 +75,7 @@ export const useSearchData = () => {
       })));
       loadState.buyers = true;
       checkComplete();
-    });
+    }, onError('buyers'));
 
     // 5. Listen to Orders
     const unsubscribeOrders = onSnapshot(query(collection(db, 'orders')), (snapshot) => {

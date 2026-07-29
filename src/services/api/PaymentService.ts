@@ -1,6 +1,6 @@
 import type { PaymentMethod, BankDetails } from '@/types/payment';
 
-const STORE_UPI_ID = import.meta.env.VITE_UPI_ID || 'anisellns27@paytm';
+const STORE_UPI_ID = import.meta.env.VITE_UPI_ID || 'subikshan182006-1@oksbi';
 
 export const PaymentService = {
   getPaymentMethodLabel(method: PaymentMethod): string {
