@@ -1,17 +1,9 @@
 import { db } from '../firebase/config';
-import { doc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, addDoc, getDocs, query, where, writeBatch } from 'firebase/firestore';
 import type { Order, Buyer } from '@/types';
+import type { PaymentInfo } from '@/types/payment';
 
-/**
- * Platform Order Management Service.
- * Centralizes order creation, status updates, and buyer order synchronization.
- * Orders are stored as an array inside the buyer's document for efficient retrieval.
- */
 export const OrderService = {
-  /**
-   * Creates a new order and persists it to the buyer's order history.
-   * Generates a unique order ID and appends to the buyer's orders array.
-   */
   async createOrder(orderData: {
     productId: string;
     buyerId: string;
@@ -20,6 +12,10 @@ export const OrderService = {
     quantity: number;
     buyerName: string;
     productName: string;
+    buyerEmail?: string;
+    buyerPhone?: string;
+    shippingAddress?: Order['shippingAddress'];
+    payment?: PaymentInfo;
   }): Promise<Order> {
     const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
@@ -32,9 +28,13 @@ export const OrderService = {
       quantity: orderData.quantity,
       status: 'PENDING',
       orderDate: new Date().toISOString(),
+      payment: orderData.payment,
+      shippingAddress: orderData.shippingAddress,
+      buyerName: orderData.buyerName,
+      buyerEmail: orderData.buyerEmail,
+      buyerPhone: orderData.buyerPhone,
     };
 
-    // Persist to buyer's order history
     const buyerRef = doc(db, 'buyers', orderData.buyerId);
     const buyerSnap = await getDoc(buyerRef);
 
@@ -49,7 +49,6 @@ export const OrderService = {
       orders: [...existingOrders, newOrder]
     });
 
-    // Also store in a top-level orders collection for admin-level queries
     await addDoc(collection(db, 'orders'), {
       ...newOrder,
       buyerName: orderData.buyerName,
@@ -60,9 +59,6 @@ export const OrderService = {
     return newOrder;
   },
 
-  /**
-   * Updates the status of a specific order within a buyer's order array.
-   */
   async updateOrderStatus(
     buyerId: string,
     orderId: string,
@@ -80,12 +76,49 @@ export const OrderService = {
       o.orderId === orderId ? { ...o, status: newStatus } : o
     );
 
-    await updateDoc(buyerRef, { orders: updatedOrders });
+    const batch = writeBatch(db);
+    batch.update(buyerRef, { orders: updatedOrders });
+
+    const ordersSnap = await getDocs(query(collection(db, 'orders'), where('orderId', '==', orderId)));
+    ordersSnap.forEach((d) => {
+      batch.update(doc(db, 'orders', d.id), { status: newStatus });
+    });
+
+    await batch.commit();
   },
 
-  /**
-   * Fetches all orders for a specific buyer.
-   */
+  async updateOrderPayment(
+    buyerId: string,
+    orderId: string,
+    payment: PaymentInfo
+  ): Promise<void> {
+    const buyerRef = doc(db, 'buyers', buyerId);
+    const buyerSnap = await getDoc(buyerRef);
+
+    if (!buyerSnap.exists()) {
+      throw new Error('Buyer record not found.');
+    }
+
+    const buyerData = buyerSnap.data() as Buyer;
+    const updatedOrders = (buyerData.orders || []).map((o: Order) =>
+      o.orderId === orderId ? { ...o, payment } : o
+    );
+
+    const batch = writeBatch(db);
+    batch.update(buyerRef, { orders: updatedOrders });
+
+    const ordersSnap = await getDocs(query(collection(db, 'orders'), where('orderId', '==', orderId)));
+    ordersSnap.forEach((d) => {
+      batch.update(doc(db, 'orders', d.id), { payment });
+    });
+
+    await batch.commit();
+  },
+
+  async cancelOrder(buyerId: string, orderId: string, _reason?: string): Promise<void> {
+    await this.updateOrderStatus(buyerId, orderId, 'CANCELLED');
+  },
+
   async getBuyerOrders(buyerId: string): Promise<Order[]> {
     const buyerRef = doc(db, 'buyers', buyerId);
     const buyerSnap = await getDoc(buyerRef);

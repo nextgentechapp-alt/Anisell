@@ -3,22 +3,17 @@ import { useSearchData } from '@/hooks/useSearchData';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import { Table } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
-import { FiBox, FiCheck, FiTruck, FiXCircle, FiX } from 'react-icons/fi';
+import { FiBox, FiCheck, FiTruck, FiXCircle, FiX, FiShield } from 'react-icons/fi';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
 import type { Product } from '@/types';
 
-/**
- * Logistics and Order Tracking Hub.
- * Analyzes platform transaction volume and coordinates fulfillment state tracking.
- */
 const AdminOrders: React.FC = () => {
   const { users, buyers, products, sellers, loading } = useSearchData();
   const [filter, setFilter] = useState('All');
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Distill all cross-platform orders from the decentralized buyer profiles
   const allOrders = useMemo(() => {
     return buyers.flatMap(b => {
       const buyerUser = users.find(u => u.uid === b.buyerId);
@@ -62,7 +57,6 @@ const AdminOrders: React.FC = () => {
       );
       
       await updateDoc(buyerRef, { orders: updatedOrders });
-      // Update local state if modal is open
       if (selectedOrder && selectedOrder.orderId === id) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
@@ -158,6 +152,20 @@ const AdminOrders: React.FC = () => {
       )
     },
     { 
+      header: 'Payment', 
+      key: 'payment', 
+      render: (o: any) => {
+        const payment = o.payment;
+        if (!payment) return <Badge label="COD" variant="neutral" />;
+        return (
+          <Badge 
+            label={payment.status === 'paid' ? 'Paid' : payment.method === 'cod' ? 'COD' : 'Pending'} 
+            variant={payment.status === 'paid' ? 'success' : 'warning'} 
+          />
+        );
+      }
+    },
+    { 
       header: 'Operational State', 
       key: 'status', 
       render: (o: any) => {
@@ -165,6 +173,7 @@ const AdminOrders: React.FC = () => {
            'DELIVERED': 'success',
            'SHIPPED': 'primary',
            'PROCESSING': 'warning',
+           'CONFIRMED': 'primary',
            'CANCELLED': 'error',
            'PENDING': 'neutral'
          };
@@ -188,6 +197,7 @@ const AdminOrders: React.FC = () => {
            >
              <option value="All">All Transactions</option>
              <option value="PENDING">Pending Action</option>
+             <option value="CONFIRMED">Confirmed</option>
              <option value="PROCESSING">Currently Processing</option>
              <option value="SHIPPED">In Transit Hubs</option>
              <option value="DELIVERED">Fulfillment Closed</option>
@@ -222,6 +232,14 @@ const AdminOrders: React.FC = () => {
                       <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
                          <h4 style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800, marginBottom: '12px' }}>Financial Clearance</h4>
                          <div style={{ fontSize: '24px', fontWeight: 800, color: '#10b981' }}>₹{selectedOrder.amount.toLocaleString()}</div>
+                         {selectedOrder.payment && (
+                           <div style={{ marginTop: '8px' }}>
+                             <Badge 
+                               label={selectedOrder.payment.status === 'paid' ? 'Payment Verified' : selectedOrder.payment.method === 'cod' ? 'COD' : 'Payment Pending'} 
+                               variant={selectedOrder.payment.status === 'paid' ? 'success' : 'warning'} 
+                             />
+                           </div>
+                         )}
                       </div>
                       <div>
                          <h4 style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800, marginBottom: '8px' }}>Fulfillment Identity</h4>
@@ -248,30 +266,50 @@ const AdminOrders: React.FC = () => {
                          <div style={{ fontSize: '15px', color: '#1e293b', fontWeight: 700 }}>{selectedOrder.productName}</div>
                          <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>{selectedOrder.productCategory} • {selectedOrder.productBreed || 'Standard Breed'}</div>
                       </div>
+                      {selectedOrder.payment && selectedOrder.payment.method !== 'cod' && (
+                        <div style={{ background: '#f0fdf4', padding: '16px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
+                          <h4 style={{ fontSize: '10px', color: '#16a34a', textTransform: 'uppercase', fontWeight: 800, marginBottom: '8px' }}>Payment Details</h4>
+                          <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>
+                            Transaction ID: {selectedOrder.payment.razorpayPaymentId || selectedOrder.payment.transactionId || 'N/A'}
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: 600, marginTop: '4px' }}>
+                            Paid: ₹{selectedOrder.payment.paidAmount?.toLocaleString() || selectedOrder.amount.toLocaleString()}
+                          </div>
+                        </div>
+                      )}
                    </section>
                 </div>
 
                 <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '32px' }}>
                    <h4 style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '0.05em' }}>Logistics State Management</h4>
-                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '12px' }}>
+                      <button 
+                         onClick={() => handleStatusUpdate(selectedOrder.orderId, selectedOrder.buyerId, 'CONFIRMED')} 
+                         disabled={selectedOrder.status !== 'PENDING'} 
+                         style={{ padding: '14px', background: '#ecfdf5', color: '#047857', border: '1px solid #d1fae5', borderRadius: '14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', opacity: selectedOrder.status !== 'PENDING' ? 0.4 : 1 }}
+                      >
+                         <FiShield /> Confirm Order
+                      </button>
                       <button 
                          onClick={() => handleStatusUpdate(selectedOrder.orderId, selectedOrder.buyerId, 'PROCESSING')} 
-                         disabled={selectedOrder.status === 'PROCESSING' || selectedOrder.status === 'DELIVERED'} 
-                         style={{ padding: '14px', background: '#fffbeb', color: '#b45309', border: '1px solid #fef3c7', borderRadius: '14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', opacity: (selectedOrder.status === 'PROCESSING' || selectedOrder.status === 'DELIVERED') ? 0.4 : 1 }}
+                         disabled={selectedOrder.status === 'PROCESSING' || selectedOrder.status === 'DELIVERED' || selectedOrder.status === 'CANCELLED'} 
+                         style={{ padding: '14px', background: '#fffbeb', color: '#b45309', border: '1px solid #fef3c7', borderRadius: '14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', opacity: (selectedOrder.status === 'PROCESSING' || selectedOrder.status === 'DELIVERED' || selectedOrder.status === 'CANCELLED') ? 0.4 : 1 }}
                       >
                          <FiBox /> Mark Processing
                       </button>
                       <button 
                          onClick={() => handleStatusUpdate(selectedOrder.orderId, selectedOrder.buyerId, 'SHIPPED')} 
-                         disabled={selectedOrder.status === 'SHIPPED' || selectedOrder.status === 'DELIVERED'} 
-                         style={{ padding: '14px', background: '#eef2ff', color: '#4338ca', border: '1px solid #e0e7ff', borderRadius: '14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', opacity: (selectedOrder.status === 'SHIPPED' || selectedOrder.status === 'DELIVERED') ? 0.4 : 1 }}
+                         disabled={selectedOrder.status === 'SHIPPED' || selectedOrder.status === 'DELIVERED' || selectedOrder.status === 'CANCELLED'} 
+                         style={{ padding: '14px', background: '#eef2ff', color: '#4338ca', border: '1px solid #e0e7ff', borderRadius: '14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', opacity: (selectedOrder.status === 'SHIPPED' || selectedOrder.status === 'DELIVERED' || selectedOrder.status === 'CANCELLED') ? 0.4 : 1 }}
                       >
                          <FiTruck /> Dispatch Item
                       </button>
+                   </div>
+                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
                       <button 
                          onClick={() => handleStatusUpdate(selectedOrder.orderId, selectedOrder.buyerId, 'DELIVERED')} 
-                         disabled={selectedOrder.status === 'DELIVERED'} 
-                         style={{ padding: '14px', background: '#ecfdf5', color: '#047857', border: '1px solid #d1fae5', borderRadius: '14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', opacity: selectedOrder.status === 'DELIVERED' ? 0.4 : 1 }}
+                         disabled={selectedOrder.status === 'DELIVERED' || selectedOrder.status === 'CANCELLED'} 
+                         style={{ padding: '14px', background: '#ecfdf5', color: '#047857', border: '1px solid #d1fae5', borderRadius: '14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', opacity: (selectedOrder.status === 'DELIVERED' || selectedOrder.status === 'CANCELLED') ? 0.4 : 1 }}
                       >
                          <FiCheck /> Complete Order
                       </button>

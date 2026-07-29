@@ -1,28 +1,26 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiTruck, FiPackage, FiCheckCircle, FiClock, FiXCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiTruck, FiPackage, FiCheckCircle, FiClock, FiXCircle, FiTrash2 } from 'react-icons/fi';
 import { useSearchData } from '@/hooks/useSearchData';
+import { useAuth } from '@/context/AuthContext';
+import { OrderService } from '@/services/api/OrderService';
 import { Badge } from '@/components/ui/Badge';
 import { ROUTES } from '@/constants/routes';
 import './OrderDetail.css';
 
-/**
- * Order Tracking & Fullfilment Workspace.
- * Orchestrates customer discovery and logistics status for historical pet marketplace acquisitions.
- * Synchronized with the high-fidelity User and Order domain models.
- */
 const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { users, buyers, products, loading } = useSearchData();
+  const { user } = useAuth();
+  const [cancelling, setCancelling] = useState(false);
 
-  // Find the required order across all platform identities (Discovery Sync)
   const orderData = useMemo(() => {
     for (const b of buyers) {
       if (b.orders) {
         const found = b.orders.find(o => o.orderId === id);
         if (found) {
-           const u = users.find(user => user.uid === b.buyerId);
+           const u = users.find(usr => usr.uid === b.buyerId);
            return { order: found, buyer: b, user: u };
         }
       }
@@ -36,8 +34,8 @@ const OrderDetail: React.FC = () => {
 
   const isDelivered = orderData?.order.status === 'DELIVERED';
   const isCancelled = orderData?.order.status === 'CANCELLED';
+  const canCancel = orderData?.order && ['PENDING', 'PROCESSING'].includes(orderData.order.status);
 
-  // Dynamic tracking orchestration based on real-time fulfillment status
   const trackingSteps = useMemo(() => {
     if (!orderData) return [];
 
@@ -74,6 +72,20 @@ const OrderDetail: React.FC = () => {
       .reverse();
   }, [orderData, isCancelled]);
 
+  const handleCancel = async () => {
+    if (!user || !orderData) return;
+    if (!window.confirm('Are you sure you want to cancel this order?')) return;
+    setCancelling(true);
+    try {
+      await OrderService.cancelOrder(user.uid, orderData.order.orderId);
+      window.location.reload();
+    } catch (err: any) {
+      alert(err.message || 'Failed to cancel order.');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   if (loading) return <div className="loading-container"><div className="spinner"></div></div>;
 
   if (!orderData || !product) {
@@ -86,7 +98,7 @@ const OrderDetail: React.FC = () => {
     );
   }
 
-  const { order, user } = orderData;
+  const { order } = orderData;
   const orderDateObj = new Date(order.orderDate);
 
   return (
@@ -100,10 +112,19 @@ const OrderDetail: React.FC = () => {
               <h1>Historical Acquisition Log</h1>
               <p>Registry #{order.orderId} • Finalized {orderDateObj.toLocaleDateString()}</p>
            </div>
+           {canCancel && (
+             <button 
+               className="btn-outline-dark"
+               onClick={handleCancel}
+               disabled={cancelling}
+               style={{ color: '#b91c1c', borderColor: '#fecaca', display: 'flex', alignItems: 'center', gap: '8px' }}
+             >
+               <FiTrash2 /> {cancelling ? 'Cancelling...' : 'Cancel Order'}
+             </button>
+           )}
         </header>
 
         <div className="od-grid">
-          {/* Fulfillment Center */}
           <div className="discovery-main">
             <section className="od-card">
               <header className="od-card-header">
@@ -143,21 +164,29 @@ const OrderDetail: React.FC = () => {
                     <p className="od-product-seller">Merchant: {product.sellerName || 'Verified Partner'}</p>
                  </div>
                  <div className="od-product-price">
-                    <div className="qty">Quantity: 1</div>
+                    <div className="qty">Quantity: {order.quantity || 1}</div>
                     <div className="price">₹{order.amount.toLocaleString()}</div>
                  </div>
               </div>
             </section>
           </div>
 
-          {/* Identity & Fiscal Oversight */}
           <div className="discovery-sidebar">
             <section className="od-card">
               <header className="od-card-header"><h3>Distribution Identity</h3></header>
               <div className="od-address">
-                 <p className="od-address-name">{user?.displayName}</p>
+                 <p className="od-address-name">{order.buyerName || orderData.user?.displayName}</p>
                  <p>Verified Buyer Account</p>
                  <p>Order placed via AniSell Marketplace</p>
+                 {order.shippingAddress && (
+                   <div style={{ marginTop: '12px', padding: '12px', background: '#f8fafc', borderRadius: '8px' }}>
+                     <p style={{ fontWeight: 600, fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>SHIPPING ADDRESS</p>
+                     <p style={{ fontSize: '13px', color: '#1e293b' }}>{order.shippingAddress.name}</p>
+                     <p style={{ fontSize: '13px', color: '#1e293b' }}>{order.shippingAddress.address}</p>
+                     <p style={{ fontSize: '13px', color: '#1e293b' }}>{order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}</p>
+                     <p style={{ fontSize: '13px', color: '#1e293b' }}>Phone: {order.shippingAddress.phone}</p>
+                   </div>
+                 )}
               </div>
             </section>
 
@@ -169,7 +198,25 @@ const OrderDetail: React.FC = () => {
                  <div className="od-summary-divider" />
                  <div className="od-summary-row total"><span>Fiscal Settlement</span><span>₹{order.amount.toLocaleString()}</span></div>
                  <div className="od-payment-method">
-                    <div className="paid-via">Authorized via Verified Payment Cluster</div>
+                   {order.payment ? (
+                     <div>
+                       <div className="paid-via" style={{ fontWeight: 700, color: '#1e293b' }}>
+                         {order.payment.method === 'cod' ? 'Cash on Delivery' : order.payment.status === 'paid' ? 'Paid via Online' : 'Payment Pending'}
+                       </div>
+                       {order.payment.status === 'paid' && (
+                         <div style={{ fontSize: '12px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+                           Transaction: {order.payment.razorpayPaymentId?.substring(0, 12) || 'Completed'}
+                         </div>
+                       )}
+                       {order.payment.method === 'cod' && (
+                         <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+                           Pay on delivery
+                         </div>
+                       )}
+                     </div>
+                   ) : (
+                     <div className="paid-via">Authorized via Verified Payment Cluster</div>
+                   )}
                  </div>
               </div>
             </section>

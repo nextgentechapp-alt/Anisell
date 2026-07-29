@@ -5,9 +5,19 @@ import Footer from '@/components/layout/Footer';
 import { useSearchData } from '@/hooks/useSearchData';
 import { useAuth } from '@/context/AuthContext';
 import { OrderService } from '@/services/api/OrderService';
-import { FiShoppingBag, FiShield, FiCheckCircle } from 'react-icons/fi';
+import { PaymentService } from '@/services/api/PaymentService';
+import { NotificationService } from '@/services/api/NotificationService';
+import { FiShoppingBag, FiShield, FiCheckCircle, FiCreditCard, FiSmartphone, FiHome, FiMonitor } from 'react-icons/fi';
 import type { Product } from '@/types';
+import type { PaymentMethod } from '@/types/payment';
 import styles from './Checkout.module.css';
+
+const paymentOptions: { method: PaymentMethod; label: string; icon: React.ReactNode; description: string }[] = [
+  { method: 'upi', label: 'GPay / PhonePe / UPI', icon: <FiSmartphone />, description: 'Pay via any UPI app' },
+  { method: 'netbanking', label: 'Net Banking', icon: <FiMonitor />, description: 'All major banks supported' },
+  { method: 'card', label: 'Credit / Debit Card', icon: <FiCreditCard />, description: 'Visa, Mastercard, RuPay' },
+  { method: 'cod', label: 'Cash on Delivery', icon: <FiHome />, description: 'Pay when delivered' },
+];
 
 const Checkout: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,10 +34,10 @@ const Checkout: React.FC = () => {
     city: '',
     state: '',
     pincode: '',
-    paymentMethod: 'cod'
   });
 
-  // Pre-fill form from Firestore data
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
+
   useEffect(() => {
     if (user || buyerData) {
       const nameParts = (user?.displayName || buyerData?.addresses?.[0]?.name || '').split(' ');
@@ -53,6 +63,7 @@ const Checkout: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [orderError, setOrderError] = useState('');
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderId, setOrderId] = useState('');
 
   const product: Product | undefined = products.find(p => p.productId === id);
 
@@ -90,7 +101,6 @@ const Checkout: React.FC = () => {
     e.preventDefault();
     setOrderError('');
 
-    // Validate form
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       setOrderError('Please enter your full name.');
       return;
@@ -115,7 +125,42 @@ const Checkout: React.FC = () => {
 
     setSubmitting(true);
     try {
-      await OrderService.createOrder({
+      const totalAmount = product.productPrice * quantity;
+      const newOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+      setOrderId(newOrderId);
+
+      let paymentInfo;
+      if (paymentMethod !== 'cod') {
+        const buyerName = `${formData.firstName} ${formData.lastName}`;
+        const result = await PaymentService.payWithRazorpay({
+          amount: totalAmount,
+          buyerName,
+          buyerEmail: formData.email,
+          buyerPhone: formData.phone,
+          orderId: newOrderId,
+        });
+
+        if (!result.success) {
+          setOrderError(result.error || 'Payment failed. Please try again.');
+          setSubmitting(false);
+          return;
+        }
+
+        paymentInfo = {
+          method: paymentMethod as PaymentMethod,
+          status: 'paid' as const,
+          razorpayPaymentId: result.paymentId,
+          paidAmount: totalAmount,
+          paidAt: new Date().toISOString(),
+        };
+      } else {
+        paymentInfo = {
+          method: 'cod' as PaymentMethod,
+          status: 'pending' as const,
+        };
+      }
+
+      const order = await OrderService.createOrder({
         productId: product.productId,
         buyerId: user.uid,
         sellerId: product.sellerId,
@@ -123,14 +168,36 @@ const Checkout: React.FC = () => {
         quantity: quantity,
         buyerName: `${formData.firstName} ${formData.lastName}`,
         productName: product.productSubCategory,
+        buyerEmail: formData.email,
+        buyerPhone: formData.phone,
+        shippingAddress: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+        },
+        payment: paymentInfo,
       });
 
       setOrderSuccess(true);
 
-      // Redirect after a brief delay so user sees success
+      NotificationService.notifyAdminNewOrder(
+        order,
+        `${formData.firstName} ${formData.lastName}`,
+        `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`
+      );
+
+      NotificationService.sendOrderConfirmationEmail(
+        order,
+        formData.email,
+        `${formData.firstName} ${formData.lastName}`
+      );
+
       setTimeout(() => {
         navigate('/profile');
-      }, 3000);
+      }, 4000);
     } catch (err: any) {
       console.error('Order placement failed:', err);
       setOrderError(err.message || 'Failed to place order. Please try again.');
@@ -150,9 +217,19 @@ const Checkout: React.FC = () => {
             <p style={{ color: '#64748b', fontSize: '16px', marginBottom: '8px' }}>
               Your order for <strong>{product.productSubCategory}</strong> has been confirmed.
             </p>
-            <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '32px' }}>
-              You will be redirected to your profile shortly to track the order.
+            <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '8px' }}>
+              Order ID: <strong>{orderId}</strong>
             </p>
+            {paymentMethod !== 'cod' && (
+              <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '32px' }}>
+                Payment successful via {PaymentService.getPaymentMethodLabel(paymentMethod)}
+              </p>
+            )}
+            {paymentMethod === 'cod' && (
+              <p style={{ color: '#f59e0b', fontSize: '14px', marginBottom: '32px' }}>
+                Pay ₹{(product.productPrice * quantity).toLocaleString('en-IN')} on delivery
+              </p>
+            )}
             <button
               onClick={() => navigate('/profile')}
               style={{ padding: '14px 32px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
@@ -174,7 +251,6 @@ const Checkout: React.FC = () => {
         <h1 className={styles.checkoutTitle}>Checkout</h1>
         
         <div className={styles.checkoutGrid}>
-          {/* Billing Form */}
           <div className={styles.sectionBlock}>
             <h2 className={styles.sectionTitle}>
               <FiShoppingBag /> Billing Information
@@ -300,15 +376,19 @@ const Checkout: React.FC = () => {
 
               <div className={styles.fieldGroup}>
                 <label className={styles.fieldLabel}>Payment Method</label>
-                <select
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
-                  onChange={handleInputChange}
-                  disabled
-                  className={`${styles.inputField} ${styles.selectField}`}
-                >
-                  <option value="cod">Cash on Delivery</option>
-                </select>
+                <div className={styles.paymentOptionsGrid}>
+                  {paymentOptions.map((opt) => (
+                    <div
+                      key={opt.method}
+                      onClick={() => setPaymentMethod(opt.method)}
+                      className={`${styles.paymentOption} ${paymentMethod === opt.method ? styles.paymentOptionActive : ''}`}
+                    >
+                      <div className={styles.paymentOptionIcon}>{opt.icon}</div>
+                      <div className={styles.paymentOptionLabel}>{opt.label}</div>
+                      <div className={styles.paymentOptionDesc}>{opt.description}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {orderError && (
@@ -318,12 +398,13 @@ const Checkout: React.FC = () => {
               )}
 
               <button type="submit" className={styles.placeOrderBtn} disabled={submitting}>
-                {submitting ? 'Processing Order...' : 'Place Order'}
+                {submitting
+                  ? paymentMethod === 'cod' ? 'Processing Order...' : 'Redirecting to Payment...'
+                  : paymentMethod === 'cod' ? 'Place Order' : `Pay ₹${(product.productPrice * quantity).toLocaleString('en-IN')}`}
               </button>
             </form>
           </div>
 
-          {/* Order Summary Sidebar */}
           <aside className={styles.checkoutSidebar}>
             <div className={styles.summaryCard}>
               <h2 className={styles.sectionTitle}>Order Summary</h2>

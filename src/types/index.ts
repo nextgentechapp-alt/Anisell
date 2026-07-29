@@ -58,6 +58,8 @@ export interface Product {
   rejectionReason?: string;
 }
 
+import type { PaymentInfo } from './payment';
+
 export interface Order {
   orderId: string;
   productId: string;
@@ -67,6 +69,18 @@ export interface Order {
   quantity: number;
   status: 'PENDING' | 'PROCESSING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   orderDate: string;
+  payment?: PaymentInfo;
+  shippingAddress?: {
+    name: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  buyerName?: string;
+  buyerEmail?: string;
+  buyerPhone?: string;
 }
 
 export interface Seller {

@@ -16,9 +16,10 @@ import styles from './Profile.module.css';
  */
 const Profile: React.FC = () => {
   const { toggleMenu } = useOutletContext<{ toggleMenu: () => void }>();
-  const { buyerData } = useAuth();
+  const { buyerData, user } = useAuth();
   const { products, loading: dataLoading } = useSearchData();
   const navigate = useNavigate();
+  const [refreshKey, setRefreshKey] = React.useState(0);
 
   // Orders live in the buyers collection, not the users collection
   const orders = buyerData?.orders || [];
@@ -47,9 +48,12 @@ const Profile: React.FC = () => {
 
       {/* 1. Fulfillment Discovery - Unified UserOrders Feature */}
       <UserOrders 
+        key={refreshKey}
         orders={orders as any} 
         products={products as any} 
+        buyerId={user?.uid}
         onTrack={(id) => navigate(`/profile/order/${id}`)}
+        onOrderCancelled={() => setRefreshKey(k => k + 1)}
       />
 
       {/* 2. Secondary Discovery - Empty State Helper */}

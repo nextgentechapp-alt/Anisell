@@ -1,5 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/Badge';
+import { OrderService } from '@/services/api/OrderService';
 import type { Order, Product } from '@/types';
 import styles from './UserOrders.module.css';
 
@@ -7,19 +8,32 @@ interface UserOrdersProps {
   orders: Order[];
   products: Product[];
   onTrack?: (id: string) => void;
+  buyerId?: string;
+  onOrderCancelled?: (orderId: string) => void;
 }
 
-/**
- * User Account Order Feature.
- * Orchestrates the customer purchase history view, leveraging the shared Badge UI 
- * component to visualize standardized shipping and fulfillment statuses.
- * Extracted from Profile.tsx to isolate customer-specific features.
- */
 export const UserOrders: React.FC<UserOrdersProps> = ({ 
   orders, 
   products,
-  onTrack 
+  onTrack,
+  buyerId,
+  onOrderCancelled,
 }) => {
+  const handleCancel = async (orderId: string) => {
+    if (!buyerId) return;
+    if (!window.confirm(`Are you sure you want to cancel order ${orderId.substring(0, 12)}?`)) return;
+    try {
+      await OrderService.cancelOrder(buyerId, orderId);
+      onOrderCancelled?.(orderId);
+    } catch (err: any) {
+      alert(err.message || 'Failed to cancel order.');
+    }
+  };
+
+  const canCancel = (order: Order) => {
+    return ['PENDING', 'PROCESSING'].includes(order.status);
+  };
+
   return (
     <div className={styles.container}>
       {orders.length > 0 ? (
@@ -33,13 +47,11 @@ export const UserOrders: React.FC<UserOrdersProps> = ({
 
              return (
                <div key={order.orderId} className={styles.orderCard}>
-                 {/* 1. Header Metdata */}
                  <header className={styles.cardHeader}>
                     <Badge label={order.status} variant={variant} />
                     <span className={styles.orderId}>ID: #{order.orderId}</span>
                  </header>
 
-                 {/* 2. Item Fulfillment Core */}
                  <div className={styles.cardBody}>
                     <img 
                       src={product?.productMedia?.[0] || 'https://via.placeholder.com/150?text=Pet+Item'} 
@@ -51,6 +63,11 @@ export const UserOrders: React.FC<UserOrdersProps> = ({
                        <div className={styles.orderMeta}>
                          Ordered on {new Date(order.orderDate).toLocaleDateString()}
                        </div>
+                       {order.payment && (
+                         <div className={styles.orderMeta}>
+                           Payment: {order.payment.method === 'cod' ? 'COD' : order.payment.status === 'paid' ? 'Paid' : 'Pending'}
+                         </div>
+                       )}
                     </div>
                     <div className={styles.actions}>
                        <span className={styles.price}>₹{order.amount.toLocaleString()}</span>
@@ -59,8 +76,17 @@ export const UserOrders: React.FC<UserOrdersProps> = ({
                          style={{ padding: '8px 16px', fontSize: '13px' }}
                          onClick={() => onTrack?.(order.orderId)}
                        >
-                         Track Detailed Progress
+                         Track Order
                        </button>
+                       {canCancel(order) && (
+                         <button 
+                           className="button-base" 
+                           style={{ padding: '8px 16px', fontSize: '13px', background: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: '8px', cursor: 'pointer' }}
+                           onClick={() => handleCancel(order.orderId)}
+                         >
+                           Cancel Order
+                         </button>
+                       )}
                     </div>
                  </div>
                </div>
