@@ -66,6 +66,25 @@ const AdminOrders: React.FC = () => {
     }
   };
 
+  const handleVerifyPayment = async (order: any) => {
+    if (!window.confirm(`Verify payment for order ${order.orderId}? This will mark payment as paid.`)) return;
+    try {
+      const buyerRecord = buyers.find(b => b.buyerId === order.buyerId);
+      if (!buyerRecord) throw new Error('Buyer record not found');
+      const buyerRef = doc(db, 'buyers', order.buyerId);
+      const updatedOrders = (buyerRecord.orders || []).map((o: any) =>
+        o.orderId === order.orderId
+          ? { ...o, payment: { ...o.payment, status: 'paid', paidAt: new Date().toISOString() } }
+          : o
+      );
+      await updateDoc(buyerRef, { orders: updatedOrders });
+      setSelectedOrder({ ...order, payment: { ...order.payment, status: 'paid', paidAt: new Date().toISOString() } });
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      alert('Failed to verify payment.');
+    }
+  };
+
   const handleProductClick = (e: React.MouseEvent, productId: string) => {
     e.stopPropagation();
     const foundProduct = products.find(p => p.productId === productId);
@@ -267,14 +286,27 @@ const AdminOrders: React.FC = () => {
                          <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>{selectedOrder.productCategory} • {selectedOrder.productBreed || 'Standard Breed'}</div>
                       </div>
                       {selectedOrder.payment && selectedOrder.payment.method !== 'cod' && (
-                        <div style={{ background: '#f0fdf4', padding: '16px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
+                        <div style={{ background: selectedOrder.payment.status === 'paid' ? '#f0fdf4' : '#fffbeb', padding: '16px', borderRadius: '12px', border: `1px solid ${selectedOrder.payment.status === 'paid' ? '#bbf7d0' : '#fde68a'}` }}>
                           <h4 style={{ fontSize: '10px', color: '#16a34a', textTransform: 'uppercase', fontWeight: 800, marginBottom: '8px' }}>Payment Details</h4>
+                          {selectedOrder.payment.utrNumber && (
+                            <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600, marginBottom: '4px' }}>
+                              UTR: {selectedOrder.payment.utrNumber}
+                            </div>
+                          )}
                           <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>
-                            Transaction ID: {selectedOrder.payment.razorpayPaymentId || selectedOrder.payment.transactionId || 'N/A'}
+                            Method: {selectedOrder.payment.method === 'upi_qr' ? 'UPI QR' : 'Bank Transfer'}
                           </div>
-                          <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: 600, marginTop: '4px' }}>
-                            Paid: ₹{selectedOrder.payment.paidAmount?.toLocaleString() || selectedOrder.amount.toLocaleString()}
+                          <div style={{ fontSize: '12px', color: selectedOrder.payment.status === 'paid' ? '#16a34a' : '#d97706', fontWeight: 600, marginTop: '4px' }}>
+                            Status: {selectedOrder.payment.status === 'paid' ? 'Verified ✓' : 'Pending Verification'}
                           </div>
+                          {selectedOrder.payment.status !== 'paid' && (
+                            <button
+                              onClick={() => handleVerifyPayment(selectedOrder)}
+                              style={{ marginTop: '12px', padding: '10px 20px', background: '#059669', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', width: '100%' }}
+                            >
+                              Verify Payment
+                            </button>
+                          )}
                         </div>
                       )}
                    </section>

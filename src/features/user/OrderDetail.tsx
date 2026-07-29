@@ -205,7 +205,7 @@ const OrderDetail: React.FC = () => {
                        </div>
                        {order.payment.status === 'paid' && (
                          <div style={{ fontSize: '12px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
-                           Transaction: {order.payment.razorpayPaymentId?.substring(0, 12) || 'Completed'}
+                           Transaction: {order.payment.transactionId || order.payment.utrNumber?.substring(0, 12) || 'Completed'}
                          </div>
                        )}
                        {order.payment.method === 'cod' && (

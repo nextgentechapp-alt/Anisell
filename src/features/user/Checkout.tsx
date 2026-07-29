@@ -7,17 +7,10 @@ import { useAuth } from '@/context/AuthContext';
 import { OrderService } from '@/services/api/OrderService';
 import { PaymentService } from '@/services/api/PaymentService';
 import { NotificationService } from '@/services/api/NotificationService';
-import { FiShoppingBag, FiShield, FiCheckCircle, FiCreditCard, FiSmartphone, FiHome, FiMonitor } from 'react-icons/fi';
+import { FiShoppingBag, FiShield, FiCheckCircle, FiSmartphone, FiHome, FiCopy, FiCheck } from 'react-icons/fi';
 import type { Product } from '@/types';
-import type { PaymentMethod } from '@/types/payment';
+import type { PaymentMethod, PaymentInfo } from '@/types/payment';
 import styles from './Checkout.module.css';
-
-const paymentOptions: { method: PaymentMethod; label: string; icon: React.ReactNode; description: string }[] = [
-  { method: 'upi', label: 'GPay / PhonePe / UPI', icon: <FiSmartphone />, description: 'Pay via any UPI app' },
-  { method: 'netbanking', label: 'Net Banking', icon: <FiMonitor />, description: 'All major banks supported' },
-  { method: 'card', label: 'Credit / Debit Card', icon: <FiCreditCard />, description: 'Visa, Mastercard, RuPay' },
-  { method: 'cod', label: 'Cash on Delivery', icon: <FiHome />, description: 'Pay when delivered' },
-];
 
 const Checkout: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,6 +30,8 @@ const Checkout: React.FC = () => {
   });
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
+  const [utrNumber, setUtrNumber] = useState('');
+  const [copiedField, setCopiedField] = useState('');
 
   useEffect(() => {
     if (user || buyerData) {
@@ -66,6 +61,15 @@ const Checkout: React.FC = () => {
   const [orderId, setOrderId] = useState('');
 
   const product: Product | undefined = products.find(p => p.productId === id);
+  const totalAmount = product ? product.productPrice * quantity : 0;
+  const bankDetails = PaymentService.getBankDetails();
+  const upiQrUrl = PaymentService.getUPIQrCodeUrl(totalAmount, orderId || 'ORDER');
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(''), 2000);
+  };
 
   if (dataLoading || authLoading) {
     return (
@@ -118,6 +122,15 @@ const Checkout: React.FC = () => {
       return;
     }
 
+    if (paymentMethod === 'bank_transfer' && !utrNumber.trim()) {
+      setOrderError('Please enter the UTR number after making the transfer.');
+      return;
+    }
+    if (paymentMethod === 'upi_qr' && !utrNumber.trim()) {
+      setOrderError('Please enter the UPI transaction reference (UTR) after payment.');
+      return;
+    }
+
     if (!user) {
       setOrderError('You must be logged in to place an order.');
       return;
@@ -125,39 +138,16 @@ const Checkout: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const totalAmount = product.productPrice * quantity;
       const newOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
       setOrderId(newOrderId);
 
-      let paymentInfo;
-      if (paymentMethod !== 'cod') {
-        const buyerName = `${formData.firstName} ${formData.lastName}`;
-        const result = await PaymentService.payWithRazorpay({
-          amount: totalAmount,
-          buyerName,
-          buyerEmail: formData.email,
-          buyerPhone: formData.phone,
-          orderId: newOrderId,
-        });
-
-        if (!result.success) {
-          setOrderError(result.error || 'Payment failed. Please try again.');
-          setSubmitting(false);
-          return;
-        }
-
-        paymentInfo = {
-          method: paymentMethod as PaymentMethod,
-          status: 'paid' as const,
-          razorpayPaymentId: result.paymentId,
-          paidAmount: totalAmount,
-          paidAt: new Date().toISOString(),
-        };
+      let paymentInfo: PaymentInfo;
+      if (paymentMethod === 'cod') {
+        paymentInfo = { method: 'cod', status: 'pending' };
+      } else if (paymentMethod === 'upi_qr') {
+        paymentInfo = { method: 'upi_qr', status: 'pending', utrNumber: utrNumber.trim() };
       } else {
-        paymentInfo = {
-          method: 'cod' as PaymentMethod,
-          status: 'pending' as const,
-        };
+        paymentInfo = { method: 'bank_transfer', status: 'pending', utrNumber: utrNumber.trim() };
       }
 
       const order = await OrderService.createOrder({
@@ -215,20 +205,25 @@ const Checkout: React.FC = () => {
             <FiCheckCircle size={64} color="#10b981" style={{ marginBottom: '24px' }} />
             <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#1e293b', marginBottom: '12px' }}>Order Placed Successfully!</h2>
             <p style={{ color: '#64748b', fontSize: '16px', marginBottom: '8px' }}>
-              Your order for <strong>{product.productSubCategory}</strong> has been confirmed.
+              Your order for <strong>{product.productSubCategory}</strong> has been placed.
             </p>
             <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '8px' }}>
               Order ID: <strong>{orderId}</strong>
             </p>
-            {paymentMethod !== 'cod' && (
-              <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '32px' }}>
-                Payment successful via {PaymentService.getPaymentMethodLabel(paymentMethod)}
-              </p>
-            )}
             {paymentMethod === 'cod' && (
               <p style={{ color: '#f59e0b', fontSize: '14px', marginBottom: '32px' }}>
-                Pay ₹{(product.productPrice * quantity).toLocaleString('en-IN')} on delivery
+                Pay ₹{totalAmount.toLocaleString('en-IN')} on delivery
               </p>
+            )}
+            {(paymentMethod === 'upi_qr' || paymentMethod === 'bank_transfer') && (
+              <div>
+                <p style={{ color: '#f59e0b', fontSize: '14px', marginBottom: '8px' }}>
+                  Payment of ₹{totalAmount.toLocaleString('en-IN')} is pending verification.
+                </p>
+                <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '32px' }}>
+                  UTR: {utrNumber} — Admin will verify and confirm your order.
+                </p>
+              </div>
             )}
             <button
               onClick={() => navigate('/profile')}
@@ -377,30 +372,128 @@ const Checkout: React.FC = () => {
               <div className={styles.fieldGroup}>
                 <label className={styles.fieldLabel}>Payment Method</label>
                 <div className={styles.paymentOptionsGrid}>
-                  {paymentOptions.map((opt) => (
-                    <div
-                      key={opt.method}
-                      onClick={() => setPaymentMethod(opt.method)}
-                      className={`${styles.paymentOption} ${paymentMethod === opt.method ? styles.paymentOptionActive : ''}`}
-                    >
-                      <div className={styles.paymentOptionIcon}>{opt.icon}</div>
-                      <div className={styles.paymentOptionLabel}>{opt.label}</div>
-                      <div className={styles.paymentOptionDesc}>{opt.description}</div>
-                    </div>
-                  ))}
+                  <div
+                    onClick={() => setPaymentMethod('upi_qr')}
+                    className={`${styles.paymentOption} ${paymentMethod === 'upi_qr' ? styles.paymentOptionActive : ''}`}
+                  >
+                    <div className={styles.paymentOptionIcon}><FiSmartphone /></div>
+                    <div className={styles.paymentOptionLabel}>GPay / PhonePe / UPI</div>
+                    <div className={styles.paymentOptionDesc}>Scan QR & pay</div>
+                  </div>
+                  <div
+                    onClick={() => setPaymentMethod('bank_transfer')}
+                    className={`${styles.paymentOption} ${paymentMethod === 'bank_transfer' ? styles.paymentOptionActive : ''}`}
+                  >
+                    <div className={styles.paymentOptionIcon}><FiSmartphone /></div>
+                    <div className={styles.paymentOptionLabel}>Bank Transfer</div>
+                    <div className={styles.paymentOptionDesc}>NEFT / IMPS</div>
+                  </div>
+                  <div
+                    onClick={() => setPaymentMethod('cod')}
+                    className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
+                  >
+                    <div className={styles.paymentOptionIcon}><FiHome /></div>
+                    <div className={styles.paymentOptionLabel}>Cash on Delivery</div>
+                    <div className={styles.paymentOptionDesc}>Pay when delivered</div>
+                  </div>
                 </div>
               </div>
 
+              {paymentMethod === 'upi_qr' && (
+                <div className={styles.paymentDetailSection}>
+                  <h3 className={styles.paymentDetailTitle}>Pay via UPI</h3>
+                  <div className={styles.qrContainer}>
+                    <img
+                      src={upiQrUrl}
+                      alt="UPI QR Code"
+                      className={styles.qrImage}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  </div>
+                  <div className={styles.upiIdRow}>
+                    <span className={styles.upiIdText}>UPI ID: {PaymentService.getUPIId()}</span>
+                    <button
+                      type="button"
+                      className={styles.copyBtn}
+                      onClick={() => copyToClipboard(PaymentService.getUPIId(), 'upi')}
+                    >
+                      {copiedField === 'upi' ? <FiCheck color="#10b981" /> : <FiCopy />} Copy
+                    </button>
+                  </div>
+                  <p className={styles.paymentHint}>Scan QR or pay to the UPI ID above. Enter the UTR / transaction reference below.</p>
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.fieldLabel}>UPI Transaction UTR</label>
+                    <input
+                      type="text"
+                      placeholder="Enter UTR number from your payment app"
+                      value={utrNumber}
+                      onChange={(e) => setUtrNumber(e.target.value)}
+                      className={styles.inputField}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {paymentMethod === 'bank_transfer' && (
+                <div className={styles.paymentDetailSection}>
+                  <h3 className={styles.paymentDetailTitle}>Bank Transfer (NEFT / IMPS)</h3>
+                  <div className={styles.bankDetailsCard}>
+                    <div className={styles.bankDetailRow}>
+                      <span className={styles.bankDetailLabel}>Account Name</span>
+                      <span className={styles.bankDetailValue}>{bankDetails.accountName}</span>
+                      <button type="button" className={styles.copyBtn} onClick={() => copyToClipboard(bankDetails.accountName, 'name')}>
+                        {copiedField === 'name' ? <FiCheck color="#10b981" /> : <FiCopy />}
+                      </button>
+                    </div>
+                    <div className={styles.bankDetailRow}>
+                      <span className={styles.bankDetailLabel}>Account Number</span>
+                      <span className={styles.bankDetailValue}>{bankDetails.accountNumber}</span>
+                      <button type="button" className={styles.copyBtn} onClick={() => copyToClipboard(bankDetails.accountNumber, 'acc')}>
+                        {copiedField === 'acc' ? <FiCheck color="#10b981" /> : <FiCopy />}
+                      </button>
+                    </div>
+                    <div className={styles.bankDetailRow}>
+                      <span className={styles.bankDetailLabel}>Bank</span>
+                      <span className={styles.bankDetailValue}>{bankDetails.bankName}</span>
+                    </div>
+                    <div className={styles.bankDetailRow}>
+                      <span className={styles.bankDetailLabel}>Branch</span>
+                      <span className={styles.bankDetailValue}>{bankDetails.branch}</span>
+                    </div>
+                    <div className={styles.bankDetailRow}>
+                      <span className={styles.bankDetailLabel}>IFSC</span>
+                      <span className={styles.bankDetailValue}>{bankDetails.ifsc}</span>
+                      <button type="button" className={styles.copyBtn} onClick={() => copyToClipboard(bankDetails.ifsc, 'ifsc')}>
+                        {copiedField === 'ifsc' ? <FiCheck color="#10b981" /> : <FiCopy />}
+                      </button>
+                    </div>
+                    <div className={styles.bankDetailRow}>
+                      <span className={styles.bankDetailLabel}>Account Type</span>
+                      <span className={styles.bankDetailValue}>{bankDetails.accountType}</span>
+                    </div>
+                  </div>
+                  <p className={styles.paymentHint}>Transfer the exact amount and enter the UTR number below. Admin will verify and confirm.</p>
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.fieldLabel}>Transaction UTR / Reference</label>
+                    <input
+                      type="text"
+                      placeholder="Enter UTR number from your bank"
+                      value={utrNumber}
+                      onChange={(e) => setUtrNumber(e.target.value)}
+                      className={styles.inputField}
+                    />
+                  </div>
+                </div>
+              )}
+
               {orderError && (
-                <div style={{ marginBottom: '16px', padding: '12px 16px', background: '#fef2f2', color: '#dc2626', borderRadius: '10px', fontSize: '14px', fontWeight: 600, border: '1px solid #fecaca' }}>
+                <div className={styles.errorBox}>
                   {orderError}
                 </div>
               )}
 
               <button type="submit" className={styles.placeOrderBtn} disabled={submitting}>
-                {submitting
-                  ? paymentMethod === 'cod' ? 'Processing Order...' : 'Redirecting to Payment...'
-                  : paymentMethod === 'cod' ? 'Place Order' : `Pay ₹${(product.productPrice * quantity).toLocaleString('en-IN')}`}
+                {submitting ? 'Processing Order...' : 'Place Order'}
               </button>
             </form>
           </div>
@@ -437,7 +530,7 @@ const Checkout: React.FC = () => {
                 </div>
                 <div className={styles.priceRow}>
                   <span>Subtotal</span>
-                  <span>₹{(product.productPrice * quantity).toLocaleString('en-IN')}</span>
+                  <span>₹{totalAmount.toLocaleString('en-IN')}</span>
                 </div>
                 <div className={styles.priceRow}>
                   <span>Delivery</span>
@@ -445,7 +538,7 @@ const Checkout: React.FC = () => {
                 </div>
                 <div className={styles.totalRow}>
                   <span>Total</span>
-                  <span className={styles.totalValue}>₹{(product.productPrice * quantity).toLocaleString('en-IN')}</span>
+                  <span className={styles.totalValue}>₹{totalAmount.toLocaleString('en-IN')}</span>
                 </div>
               </div>
             </div>
@@ -459,7 +552,7 @@ const Checkout: React.FC = () => {
                   <div className={styles.promiseDot} /> Health certificate included
                 </li>
                 <li className={styles.promiseItem}>
-                  <div className={styles.promiseDot} /> no return policy
+                  <div className={styles.promiseDot} /> No return policy
                 </li>
                 <li className={styles.promiseItem}>
                   <div className={styles.promiseDot} /> Free vaccination records
