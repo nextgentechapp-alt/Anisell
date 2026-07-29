@@ -4,7 +4,9 @@ import { PetProductService } from '@/services/api/petverse/PetProductService';
 import { SkeletonTableRow } from '@/components/ui/Skeleton';
 import { Table } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
-import { FiX } from 'react-icons/fi';
+import { FiX, FiShield, FiTrash2 } from 'react-icons/fi';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/services/firebase/config';
 
 /**
  * Platform Supply Oversight.
@@ -34,6 +36,38 @@ const AdminProducts: React.FC = () => {
   const currentProducts: any[] = tab === 'petverse' ? petverseProducts : products;
   const uniqueTypes = ['All', ...Array.from(new Set(currentProducts.map((p: any) => p.productType || p.categorySlug || '')))].filter(Boolean);
   const filteredProducts = currentProducts.filter((p: any) => filterType === 'All' || p.productType === filterType || p.categorySlug === filterType);
+
+  const handleAction = async (id: string, action: string) => {
+    const targetName = (selectedProduct as any)?.productSubCategory || (selectedProduct as any)?.title || 'this listing';
+    if (!window.confirm(`Are you sure you want to ${action === 'Delete' ? 'permanently delete' : action === 'Approve' ? 'approve' : 'reject'} "${targetName}"?`)) return;
+
+    try {
+      if (tab === 'main') {
+        const productRef = doc(db, 'products', id);
+        if (action === 'Delete') {
+          await deleteDoc(productRef);
+          setSelectedProduct(null);
+        } else {
+          await updateDoc(productRef, { status: action === 'Approve' ? 'APPROVED' : 'REJECTED' });
+          setSelectedProduct((prev: any) => prev?.productId === id || prev?.id === id ? { ...prev, status: action === 'Approve' ? 'APPROVED' : 'REJECTED' } : prev);
+        }
+      } else {
+        const statusMap: Record<string, 'APPROVED' | 'REJECTED'> = { Approve: 'APPROVED', Reject: 'REJECTED' };
+        if (action === 'Delete') {
+          await PetProductService.deleteProduct(id);
+          setSelectedProduct(null);
+        } else {
+          await PetProductService.updateProduct(id, { status: statusMap[action] } as any);
+          setSelectedProduct((prev: any) => prev?.productId === id || prev?.id === id ? { ...prev, status: statusMap[action] } : prev);
+        }
+        const updated = await PetProductService.getAllProducts();
+        setPetverseProducts(updated);
+      }
+    } catch (error) {
+      console.error(`Failed to ${action} product ${id}:`, error);
+      alert(`Action failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
 
   const productColumns = [
     { 
@@ -136,18 +170,36 @@ const AdminProducts: React.FC = () => {
                     </div>
                  </div>
 
-                 <div style={{ padding: '40px' }}>
-                    <header style={{ marginBottom: '32px' }}>
-                       <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.05em' }}>Inventory Operations Registry</div>
-                       <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>{(selectedProduct as any).productSubCategory || (selectedProduct as any).title}</h2>
-                       <div style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>{(selectedProduct as any).productCategory || (selectedProduct as any).categorySlug} • {(selectedProduct as any).productType || 'Standard'}</div>
-                    </header>
+                  <div style={{ padding: '40px' }}>
+                     <header style={{ marginBottom: '32px' }}>
+                        <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.05em' }}>Inventory Operations Registry</div>
+                        <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>{(selectedProduct as any).productSubCategory || (selectedProduct as any).title}</h2>
+                        <div style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>{(selectedProduct as any).productCategory || (selectedProduct as any).categorySlug} • {(selectedProduct as any).productType || 'Standard'}</div>
+                     </header>
 
-                    <div style={{ background: '#f1f5f9', padding: '20px', borderRadius: '20px', marginBottom: '32px', border: '1px solid #e2e8f0' }}>
-                       <div style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: 800, marginBottom: '4px' }}>Commercial Valuation</div>
-                       <div style={{ fontSize: '32px', fontWeight: 800, color: '#2563eb' }}>₹{((selectedProduct as any).productPrice || (selectedProduct as any).price || 0).toLocaleString()}</div>
-                    </div>
-                 </div>
+                     <div style={{ background: '#f1f5f9', padding: '20px', borderRadius: '20px', marginBottom: '32px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: 800, marginBottom: '4px' }}>Commercial Valuation</div>
+                        <div style={{ fontSize: '32px', fontWeight: 800, color: '#2563eb' }}>₹{((selectedProduct as any).productPrice || (selectedProduct as any).price || 0).toLocaleString()}</div>
+                     </div>
+
+                     <div style={{ display: 'flex', gap: '12px', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                           {selectedProduct.status !== 'APPROVED' && (
+                             <button onClick={() => handleAction(selectedProduct.productId || selectedProduct.id, 'Approve')} style={{ flex: 1, padding: '12px', background: '#059669', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                               <FiShield /> Approve Listing
+                             </button>
+                           )}
+                           {selectedProduct.status !== 'REJECTED' && (
+                             <button onClick={() => handleAction(selectedProduct.productId || selectedProduct.id, 'Reject')} style={{ flex: 1, padding: '12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
+                               Reject Listing
+                             </button>
+                           )}
+                        </div>
+                        <button onClick={() => handleAction(selectedProduct.productId || selectedProduct.id, 'Delete')} style={{ padding: '12px', background: '#fff', color: '#dc2626', border: '2px solid #fecaca', borderRadius: '12px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <FiTrash2 /> Permanently Delete
+                        </button>
+                     </div>
+                  </div>
               </div>
            </div>
         </div>
