@@ -11,6 +11,12 @@ import '@/features/petverse/petverse.css';
 
 const ADMIN_PHONE = import.meta.env.VITE_ADMIN_PHONE || '';
 
+const normalizePhone = (p: string) => {
+  const digits = p.replace(/[^0-9]/g, '');
+  if (digits.length === 10) return `91${digits}`;
+  return digits;
+};
+
 const PetverseCheckout: React.FC = () => {
   const { user } = useAuth();
   const { items, clearCart } = usePetverseCart();
@@ -141,7 +147,7 @@ const PetverseCheckout: React.FC = () => {
       if (ADMIN_PHONE) {
         const itemsSummary = orderItems.map(i => `${i.title} x${i.quantity}`).join(', ');
         const msg = `New Order!\nOrder: ${orderId}\nBuyer: ${user.displayName || user.uid}\nItems: ${itemsSummary}\nTotal: ₹${total}\nPayment: ${paymentMethod}\nAddress: ${address.line1}, ${address.city}`;
-        window.open(`https://wa.me/${ADMIN_PHONE.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+        window.open(`https://wa.me/${normalizePhone(ADMIN_PHONE)}?text=${encodeURIComponent(msg)}`, '_blank');
       }
       navigate(PETVERSE_ROUTES.orderPath(orderId));
     } finally {

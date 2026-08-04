@@ -3,12 +3,18 @@ import type { Order } from '@/types';
 const ADMIN_PHONE = import.meta.env.VITE_ADMIN_PHONE || '';
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAILS?.split(',')[0] || '';
 
+const normalizePhone = (p: string) => {
+  const digits = p.replace(/[^0-9]/g, '');
+  if (digits.length === 10) return `91${digits}`;
+  return digits;
+};
+
 export const NotificationService = {
   async notifyAdminNewOrder(order: Order, buyerName: string, address: string): Promise<void> {
     const message = `New Order!\nOrder: ${order.orderId}\nBuyer: ${buyerName}\nProduct: ${order.productId}\nAmount: ₹${order.amount}\nAddress: ${address}\nPayment: ${order.payment?.method || 'COD'}`;
 
     if (ADMIN_PHONE) {
-      const waUrl = `https://wa.me/${ADMIN_PHONE.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+      const waUrl = `https://wa.me/${normalizePhone(ADMIN_PHONE)}?text=${encodeURIComponent(message)}`;
       window.open(waUrl, '_blank');
     }
 
