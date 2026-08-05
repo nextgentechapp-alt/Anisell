@@ -56,6 +56,14 @@ const AdminOrders: React.FC = () => {
 
   const updatePetverseOrderStatus = async (orderId: string, newStatus: string) => {
     if (!window.confirm(`Advance Petverse order ${orderId} to ${newStatus}?`)) return;
+    const order = petverseOrders.find((o: any) => o.id === orderId);
+    const buyerPhone = order?.shippingAddress?.phone || '';
+    const cleanPhone = buyerPhone.replace(/[^0-9]/g, '');
+    let waWindow: Window | null = null;
+    if (cleanPhone.length >= 10) {
+      const msg = `Hi ${order?.shippingAddress?.fullName || 'Customer'},\nYour petverse order ${orderId.slice(0, 8).toUpperCase()} has been updated to: ${newStatus}\nThank you for shopping with AniSell!`;
+      waWindow = window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
     try {
       await PetOrderService.updateOrderStatus(orderId, newStatus as any);
       const updated = await PetOrderService.getAllOrders();
@@ -63,12 +71,11 @@ const AdminOrders: React.FC = () => {
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
-      const order = updated.find((o: any) => o.id === orderId);
-      const buyerPhone = order?.shippingAddress?.phone || '';
-      const cleanPhone = buyerPhone.replace(/[^0-9]/g, '');
-      if (cleanPhone.length >= 10) {
-        const msg = `Hi ${order?.shippingAddress?.fullName || 'Customer'},\nYour petverse order ${orderId.slice(0, 8).toUpperCase()} has been updated to: ${newStatus}\nThank you for shopping with AniSell!`;
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+      if (waWindow) {
+        const freshOrder = updated.find((o: any) => o.id === orderId);
+        const phone = (freshOrder?.shippingAddress?.phone || '').replace(/[^0-9]/g, '');
+        const msg = `Hi ${freshOrder?.shippingAddress?.fullName || 'Customer'},\nYour petverse order ${orderId.slice(0, 8).toUpperCase()} has been updated to: ${newStatus}\nThank you for shopping with AniSell!`;
+        waWindow.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
       }
     } catch (error) {
       alert(`Failed to update order: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -80,10 +87,18 @@ const AdminOrders: React.FC = () => {
 
   const handleStatusUpdate = async (id: string, buyerId: string, newStatus: string) => {
     if (!window.confirm(`Advance order ${id} to ${newStatus}?`)) return;
+    const buyerRecord = buyers.find(b => b.buyerId === buyerId);
+    if (!buyerRecord) { alert('Orphaned Order'); return; }
+    const orderRecord = (buyerRecord.orders || []).find((o: any) => o.orderId === id);
+    const buyerPhone = buyerRecord.phone || orderRecord?.shippingAddress?.phone || '';
+    const cleanPhone = buyerPhone.replace(/[^0-9]/g, '');
+    let waWindow: Window | null = null;
+    if (cleanPhone.length >= 10) {
+      const buyerName = users.find(u => u.uid === buyerId)?.displayName || 'Customer';
+      const msg = `Hi ${buyerName},\nYour order ${id.slice(0, 8).toUpperCase()} has been updated to: ${newStatus}\nThank you for shopping with AniSell!`;
+      waWindow = window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
     try {
-      const buyerRecord = buyers.find(b => b.buyerId === buyerId);
-      if (!buyerRecord) throw new Error('Orphaned Order');
-      
       const buyerRef = doc(db, 'buyers', buyerId);
       const updatedOrders = (buyerRecord.orders || []).map((o: any) => 
          o.orderId === id ? { ...o, status: newStatus as any } : o
@@ -93,15 +108,10 @@ const AdminOrders: React.FC = () => {
       if (selectedOrder && selectedOrder.orderId === id) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
-
-      // Notify buyer via WhatsApp
-      const orderRecord = (buyerRecord.orders || []).find((o: any) => o.orderId === id);
-      const buyerPhone = buyerRecord.phone || orderRecord?.shippingAddress?.phone || '';
-      const cleanPhone = buyerPhone.replace(/[^0-9]/g, '');
-      if (cleanPhone.length >= 10) {
+      if (waWindow) {
         const buyerName = users.find(u => u.uid === buyerId)?.displayName || 'Customer';
         const msg = `Hi ${buyerName},\nYour order ${id.slice(0, 8).toUpperCase()} has been updated to: ${newStatus}\nThank you for shopping with AniSell!`;
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        waWindow.location.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
       }
     } catch (error) {
       console.error(`Failed to execute logistics update on order ${id}:`, error);

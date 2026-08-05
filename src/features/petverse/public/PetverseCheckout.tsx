@@ -111,6 +111,13 @@ const PetverseCheckout: React.FC = () => {
     }
     if (!addressComplete || lines.length === 0) return;
 
+    let waWindow: Window | null = null;
+    if (ADMIN_PHONE) {
+      const itemsSummary = lines.map((l) => `${l.product.title} x${l.line.quantity}`).join(', ');
+      const msg = `New Order!\nBuyer: ${user?.displayName || user?.uid || ''}\nItems: ${itemsSummary}\nTotal: ₹${total}\nPayment: ${paymentMethod}\nAddress: ${address.line1}, ${address.city}`;
+      waWindow = window.open(`https://wa.me/${normalizePhone(ADMIN_PHONE)}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
     setPlacing(true);
     try {
       const orderItems: PetOrderItem[] = lines.map((l) => ({
@@ -143,11 +150,10 @@ const PetverseCheckout: React.FC = () => {
 
       const orderId = await PetOrderService.placeOrder(order);
       clearCart();
-      // Notify admin via WhatsApp
-      if (ADMIN_PHONE) {
+      if (waWindow) {
         const itemsSummary = orderItems.map(i => `${i.title} x${i.quantity}`).join(', ');
         const msg = `New Order!\nOrder: ${orderId}\nBuyer: ${user.displayName || user.uid}\nItems: ${itemsSummary}\nTotal: ₹${total}\nPayment: ${paymentMethod}\nAddress: ${address.line1}, ${address.city}`;
-        window.open(`https://wa.me/${normalizePhone(ADMIN_PHONE)}?text=${encodeURIComponent(msg)}`, '_blank');
+        waWindow.location.href = `https://wa.me/${normalizePhone(ADMIN_PHONE)}?text=${encodeURIComponent(msg)}`;
       }
       navigate(PETVERSE_ROUTES.orderPath(orderId));
     } finally {

@@ -10,12 +10,16 @@ const normalizePhone = (p: string) => {
 };
 
 export const NotificationService = {
-  async notifyAdminNewOrder(order: Order, buyerName: string, address: string): Promise<void> {
+  async notifyAdminNewOrder(order: Order, buyerName: string, address: string, waWindow: Window | null = null): Promise<void> {
     const message = `New Order!\nOrder: ${order.orderId}\nBuyer: ${buyerName}\nProduct: ${order.productId}\nAmount: ₹${order.amount}\nAddress: ${address}\nPayment: ${order.payment?.method || 'COD'}`;
 
     if (ADMIN_PHONE) {
       const waUrl = `https://wa.me/${normalizePhone(ADMIN_PHONE)}?text=${encodeURIComponent(message)}`;
-      window.open(waUrl, '_blank');
+      if (waWindow) {
+        waWindow.location.href = waUrl;
+      } else {
+        window.open(waUrl, '_blank');
+      }
     }
 
     if (ADMIN_EMAIL) {

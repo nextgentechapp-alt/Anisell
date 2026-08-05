@@ -138,6 +138,7 @@ const Checkout: React.FC = () => {
     }
 
     setSubmitting(true);
+    const waWindow: Window | null = window.open('', '_blank');
     try {
       const newOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
       setOrderId(newOrderId);
@@ -177,7 +178,8 @@ const Checkout: React.FC = () => {
       NotificationService.notifyAdminNewOrder(
         order,
         `${formData.firstName} ${formData.lastName}`,
-        `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`
+        `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+        waWindow
       );
 
       NotificationService.sendOrderConfirmationEmail(
