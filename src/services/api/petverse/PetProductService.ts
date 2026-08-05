@@ -30,21 +30,40 @@ const CATEGORIES_COLLECTION = 'petverse_categories';
  */
 export const PetProductService = {
   async getAllProducts(): Promise<PetProduct[]> {
-    return PETVERSE_PRODUCTS;
+    if (IS_MOCK) return PETVERSE_PRODUCTS;
+    const db = await getFirestore();
+    if (!db || !firestoreDb) return PETVERSE_PRODUCTS;
+    try {
+      const { collection, getDocs } = firestoreDb;
+      const snap = await getDocs(collection(db, PRODUCTS_COLLECTION));
+      const firestoreProducts = snap.docs.map((d) => d.data() as PetProduct);
+      const merged = [...PETVERSE_PRODUCTS];
+      firestoreProducts.forEach((p) => {
+        const existingIndex = merged.findIndex((m) => m.id === p.id);
+        if (existingIndex >= 0) merged[existingIndex] = p;
+        else merged.push(p);
+      });
+      return merged;
+    } catch {
+      return PETVERSE_PRODUCTS;
+    }
   },
 
   async getProductsByCategory(categorySlug: PetVerseCategorySlug): Promise<PetProduct[]> {
-    return PETVERSE_PRODUCTS.filter((p) => p.categorySlug === categorySlug);
+    const all = await this.getAllProducts();
+    return all.filter((p) => p.categorySlug === categorySlug);
   },
 
   async getProductById(id: string): Promise<PetProduct | null> {
-    return PETVERSE_PRODUCTS.find((p) => p.id === id) ?? null;
+    const all = await this.getAllProducts();
+    return all.find((p) => p.id === id) ?? null;
   },
 
   async searchProducts(term: string): Promise<PetProduct[]> {
     const lower = term.trim().toLowerCase();
-    if (!lower) return PETVERSE_PRODUCTS;
-    return PETVERSE_PRODUCTS.filter(
+    const all = await this.getAllProducts();
+    if (!lower) return all;
+    return all.filter(
       (p) =>
         p.title.toLowerCase().includes(lower) ||
         p.brand.toLowerCase().includes(lower) ||
