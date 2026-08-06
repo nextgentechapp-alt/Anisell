@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePetverseCart } from '@/context/PetverseCartContext';
 import { PetProductService } from '@/services/api/petverse/PetProductService';
+import { PlatformSettingsService, type DeliverySettings } from '@/services/api/PlatformSettingsService';
 import { PETVERSE_ROUTES } from '@/constants/petverseRoutes';
 import type { PetProduct } from '@/types/petverse';
 import '@/features/petverse/petverse.css';
@@ -11,6 +12,18 @@ const PetverseCart: React.FC = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Record<string, PetProduct>>({});
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [deliverySettings, setDeliverySettings] = useState<DeliverySettings>({ fee: 49, freeThreshold: 999 });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const settings = await PlatformSettingsService.getDeliverySettings();
+      if (!cancelled) setDeliverySettings(settings);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -44,7 +57,7 @@ const PetverseCart: React.FC = () => {
     .filter(Boolean) as { line: (typeof items)[number]; product: PetProduct; variant?: PetProduct['variants'][number]; unitPrice: number; lineTotal: number }[];
 
   const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
-  const deliveryFee = subtotal > 999 || subtotal === 0 ? 0 : 49;
+  const deliveryFee = subtotal === 0 ? 0 : subtotal > deliverySettings.freeThreshold ? 0 : deliverySettings.fee;
   const total = subtotal + deliveryFee;
 
   if (loading || loadingProducts) return <div className="pv-loading">Loading your cart…</div>;

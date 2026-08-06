@@ -1,12 +1,14 @@
 import { FiBell, FiAlertCircle, FiMessageCircle, FiLogOut } from 'react-icons/fi';
 import { AuthService } from '@/services/api/AuthService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 /**
  * System Settings & Alerts Configuration Hub.
  */
 const AdminSettings: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/profile';
 
   const handleLogout = async () => {
     if (window.confirm('Terminate administrative session and protect the registry?')) {
@@ -38,7 +40,7 @@ const AdminSettings: React.FC = () => {
               <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 700 }}>Notification Distribution Matrix</h4>
               <p style={{ margin: '0 0 16px 0', color: '#64748b', fontSize: '14px', lineHeight: '1.6' }}>Define rules for how critical transaction state changes notify global administrators.</p>
               <div style={{ display: 'flex', gap: '8px' }}>
-                 <button className="button-base" style={{ padding: '8px 16px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', fontWeight: 600 }}>Configure Delivery</button>
+                 <button className="button-base" onClick={() => navigate(`${basePath}/coupons`)} style={{ padding: '8px 16px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', fontWeight: 600 }}>Configure Delivery</button>
                  <button className="button-base button-outline" style={{ fontSize: '13px' }}>Silence Alerts</button>
               </div>
            </div>

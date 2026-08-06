@@ -9,6 +9,7 @@ const AdminProducts = lazy(() => import('@/features/admin/AdminProducts'));
 const AdminOrders = lazy(() => import('@/features/admin/AdminOrders'));
 const AdminPayments = lazy(() => import('@/features/admin/AdminPayments'));
 const AdminAnalytics = lazy(() => import('@/features/admin/AdminAnalytics'));
+const AdminCoupons = lazy(() => import('@/features/admin/AdminCoupons'));
 const AdminSettings = lazy(() => import('@/features/admin/AdminSettings'));
 
 /**
@@ -50,6 +51,10 @@ export const adminRoutes: RouteObject[] = [
   {
     path: 'analytics',
     element: <AdminAnalytics />,
+  },
+  {
+    path: 'coupons',
+    element: <AdminCoupons />,
   },
   {
     path: 'settings',

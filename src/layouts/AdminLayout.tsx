@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   FiGrid, FiUsers, FiShoppingBag, FiArchive, 
-  FiDollarSign, FiPieChart, FiBell, FiBriefcase
+  FiDollarSign, FiPieChart, FiBell, FiBriefcase, FiTag
 } from 'react-icons/fi';
 import { useAuth } from '@/context/AuthContext';
 import { getMainDomainUrl } from '@/utils/subdomain';
@@ -58,6 +58,7 @@ const AdminLayout: React.FC = () => {
     { path: `${basePath}/orders`, icon: <FiArchive />, label: 'Order Tracking' },
     { path: `${basePath}/payments`, icon: <FiDollarSign />, label: 'Payments & Revenue' },
     { path: `${basePath}/analytics`, icon: <FiPieChart />, label: 'Platform Analytics' },
+    { path: `${basePath}/coupons`, icon: <FiTag />, label: 'Coupons & Delivery' },
     { path: `${basePath}/settings`, icon: <FiBell />, label: 'Alerts & Settings' },
   ];
 

@@ -4,9 +4,10 @@ import { useAuth } from '@/context/AuthContext';
 import { usePetverseCart } from '@/context/PetverseCartContext';
 import { PetProductService } from '@/services/api/petverse/PetProductService';
 import { PetOrderService } from '@/services/api/petverse/PetOrderService';
-import { PETVERSE_COUPONS } from '@/data/petverseCatalog';
+import { PetCouponService } from '@/services/api/petverse/PetCouponService';
+import { PlatformSettingsService, type DeliverySettings } from '@/services/api/PlatformSettingsService';
 import { PETVERSE_ROUTES } from '@/constants/petverseRoutes';
-import type { PetAddress, PetOrder, PetOrderItem, PetProduct } from '@/types/petverse';
+import type { PetAddress, PetCoupon, PetOrder, PetOrderItem, PetProduct } from '@/types/petverse';
 import '@/features/petverse/petverse.css';
 
 const DEFAULT_ADMIN_PHONE = '6380137032';
@@ -27,6 +28,8 @@ const PetverseCheckout: React.FC = () => {
 
   const [products, setProducts] = useState<Record<string, PetProduct>>({});
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [coupons, setCoupons] = useState<PetCoupon[]>([]);
+  const [deliverySettings, setDeliverySettings] = useState<DeliverySettings>({ fee: 49, freeThreshold: 999 });
   const [address, setAddress] = useState<PetAddress>({
     fullName: user?.displayName ?? '',
     phone: '',
@@ -40,9 +43,26 @@ const PetverseCheckout: React.FC = () => {
   const [utr, setUtr] = useState('');
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [couponInput, setCouponInput] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<(typeof PETVERSE_COUPONS)[number] | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<PetCoupon | null>(null);
   const [couponError, setCouponError] = useState('');
   const [placing, setPlacing] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [allCoupons, settings] = await Promise.all([
+        PetCouponService.getAllCoupons(),
+        PlatformSettingsService.getDeliverySettings(),
+      ]);
+      if (!cancelled) {
+        setCoupons(allCoupons);
+        setDeliverySettings(settings);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,7 +95,7 @@ const PetverseCheckout: React.FC = () => {
     .filter(Boolean) as { line: (typeof items)[number]; product: PetProduct; unitPrice: number }[];
 
   const subtotal = lines.reduce((sum, l) => sum + l.unitPrice * l.line.quantity, 0);
-  const deliveryFee = subtotal > 999 || subtotal === 0 ? 0 : 49;
+  const deliveryFee = subtotal === 0 ? 0 : subtotal > deliverySettings.freeThreshold ? 0 : deliverySettings.fee;
 
   const discount = useMemo(() => {
     if (!appliedCoupon) return 0;
@@ -90,7 +110,7 @@ const PetverseCheckout: React.FC = () => {
   const total = subtotal + deliveryFee - discount;
 
   const handleApplyCoupon = () => {
-    const found = PETVERSE_COUPONS.find((c) => c.code.toLowerCase() === couponInput.trim().toLowerCase() && c.active);
+    const found = coupons.find((c) => c.code.toLowerCase() === couponInput.trim().toLowerCase() && c.active);
     if (!found) {
       setCouponError('Invalid or expired coupon code.');
       setAppliedCoupon(null);
