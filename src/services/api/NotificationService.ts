@@ -1,12 +1,15 @@
 import type { Order } from '@/types';
 
-const ADMIN_PHONE = import.meta.env.VITE_ADMIN_PHONE || '';
+const DEFAULT_ADMIN_PHONE = '6380137032';
+const ADMIN_PHONE = import.meta.env.VITE_ADMIN_PHONE || DEFAULT_ADMIN_PHONE;
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAILS?.split(',')[0] || '';
 
 const normalizePhone = (p: string) => {
-  const digits = p.replace(/[^0-9]/g, '');
+  let digits = p.replace(/[^0-9]/g, '');
   if (digits.length === 10) return `91${digits}`;
-  return digits;
+  if (digits.length === 12 && digits.startsWith('91')) return digits;
+  digits = DEFAULT_ADMIN_PHONE.replace(/[^0-9]/g, '');
+  return digits.length === 10 ? `91${digits}` : digits;
 };
 
 export const NotificationService = {
